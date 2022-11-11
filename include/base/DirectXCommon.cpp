@@ -4,6 +4,8 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 
+
+
 DirectXCommon* DirectXCommon::GetInstance() 
 {
 	static DirectXCommon instance;
@@ -31,9 +33,66 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	CreateFence();
 }
 
-void DirectXCommon::Finalize() 
+void DirectXCommon::PreDraw() 
 {
+	// バックバッファの番号を取得（２つなので０番か１番）
+	UINT bbIndex = m_swapChain->GetCurrentBackBufferIndex();
 
+	// リソースバリアで書き込み可能に変更
+	D3D12_RESOURCE_BARRIER barrierDesc = {};
+	barrierDesc.Transition.pResource = m_backBuffers[bbIndex].Get();
+	barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	m_cmdList->ResourceBarrier(1, &barrierDesc);
+
+	// レンダーターゲットビューのハンドルを取得
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
+	rtvHandle.ptr += bbIndex * m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	m_cmdList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
+
+	// 画面クリア
+	m_cmdList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+			
+}
+
+void DirectXCommon::PostDraw() 
+{
+	HRESULT result = S_FALSE;
+	// バックバッファの番号を取得（２つなので０番か１番）
+	UINT bbIndex = m_swapChain->GetCurrentBackBufferIndex();
+	// リソースバリアを戻す
+	D3D12_RESOURCE_BARRIER barrierDesc = {};
+	barrierDesc.Transition.pResource = m_backBuffers[bbIndex].Get();
+	barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	m_cmdList->ResourceBarrier(1, &barrierDesc);
+
+	// 命令のクローズ
+	result = m_cmdList->Close();
+	assert(SUCCEEDED(result));
+
+	// コマンドリストの実行
+	ID3D12CommandList* cmdLists[] = { m_cmdList.Get() };
+	m_cmdQueue->ExecuteCommandLists(1, cmdLists);
+
+	// 画面に表示するバッファをフリップ（裏表の入れ替え）
+	result = m_swapChain->Present(1, 0);
+	assert(SUCCEEDED(result));
+
+	// コマンドの実行完了を待つ
+	m_cmdQueue->Signal(m_fence.Get(), ++mFenceVal);
+	if (m_fence->GetCompletedValue() != mFenceVal) {
+		HANDLE event = CreateEvent(nullptr, false, false, nullptr);
+		m_fence->SetEventOnCompletion(mFenceVal, event);
+		WaitForSingleObject(event, INFINITE);
+		CloseHandle(event);
+	}
+	// キューをクリア
+	result = m_cmdAllocator->Reset();
+	assert(SUCCEEDED(result));
+	// 再びコマンドリストをためる準備
+	result = m_cmdList->Reset(m_cmdAllocator.Get(), nullptr);
+	assert(SUCCEEDED(result));
 }
 
 void DirectXCommon::CreateFactory()
@@ -194,6 +253,7 @@ void DirectXCommon::DebugLayer()
 		_debugController->SetEnableGPUBasedValidation(TRUE);
 	}
 }
+
 void DirectXCommon::DebugSuppressError() 
 {
 	ComPtr<ID3D12InfoQueue> _infoQueue;

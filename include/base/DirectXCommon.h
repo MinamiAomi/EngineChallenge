@@ -16,7 +16,7 @@ private:
 	using ComPtr = Microsoft::WRL::ComPtr<TYPE>;
 
 private:
-	WinApp* m_winApp;
+	WinApp* m_winApp = nullptr;
 
 	ComPtr<ID3D12Device>				 m_device;
 	ComPtr<IDXGIFactory6>				 m_dxgiFactory;
@@ -30,12 +30,23 @@ private:
 
 	UINT64 mFenceVal = 0;
 
+	FLOAT clearColor[4] = { 0.1f,0.25f,0.5f,0.0f };
+
+
 public: // ê√ìIÉÅÉìÉoä÷êî
 	static DirectXCommon* GetInstance();
 
 public:
+	inline ID3D12Device* GetDevice() { return m_device.Get(); }
+	inline ID3D12GraphicsCommandList* GetCommandList() { return m_cmdList.Get(); }
+
+	inline IDXGISwapChain4* GetSwapChain() { return m_swapChain.Get(); }
+	inline ID3D12Resource* GetBackBaffer(int i) { return m_backBuffers[i].Get(); }
+
+
 	void Initialize(WinApp* winApp);
-	void Finalize();
+	void PreDraw();
+	void PostDraw();
 
 private:
 	DirectXCommon() = default;
