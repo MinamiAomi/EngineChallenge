@@ -10,13 +10,12 @@ class WinApp
 {
 
 private: // メンバ変数
-	static const wchar_t* kWindowTitle;	// ウィンドウタイトル
 
 	WNDCLASSEX mWndClass = {};
 	HWND mHwnd = nullptr;
 	int mWindowWidth = 0;	// ウィンドウ幅
 	int mWindowHeight = 0;	// ウィンドウ高
-	
+
 public: // 静的メンバ関数
 	static WinApp* GetInstance();
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
@@ -25,8 +24,9 @@ public:
 	inline HWND GetHwnd() const { return mHwnd; }
 	inline int GetWindowWidth() const { return mWindowWidth; }
 	inline int GetWindowHeight() const { return mWindowHeight; }
+	inline HINSTANCE GetHInstance() const { return mWndClass.hInstance; }
 
-	void Initialize(int windowWidth = 1280, int windowHeight = 720);
+	void Initialize(int windowWidth = 1280, int windowHeight = 720, const wchar_t* windowTitle = L"DirectXGame");
 	bool WindowQUit();
 	void Finalize();
 

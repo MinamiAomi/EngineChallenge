@@ -1,5 +1,6 @@
 #include "DirectXCommon.h"
 #include <cassert>
+#include <d3dx12.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -38,11 +39,11 @@ void DirectXCommon::PreDraw()
 	// バックバッファの番号を取得（２つなので０番か１番）
 	UINT bbIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-	// リソースバリアで書き込み可能に変更
-	D3D12_RESOURCE_BARRIER barrierDesc = {};
-	barrierDesc.Transition.pResource = m_backBuffers[bbIndex].Get();
-	barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	D3D12_RESOURCE_BARRIER barrierDesc = CD3DX12_RESOURCE_BARRIER::Transition(
+		m_backBuffers[bbIndex].Get(),
+		D3D12_RESOURCE_STATE_PRESENT,
+		D3D12_RESOURCE_STATE_RENDER_TARGET);
+
 	m_cmdList->ResourceBarrier(1, &barrierDesc);
 
 	// レンダーターゲットビューのハンドルを取得
@@ -52,7 +53,15 @@ void DirectXCommon::PreDraw()
 
 	// 画面クリア
 	m_cmdList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-			
+
+	// ビューポート
+	D3D12_VIEWPORT viewport = 
+		CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(m_winApp->GetWindowWidth()), static_cast<float>(m_winApp->GetWindowHeight()));
+	m_cmdList->RSSetViewports(1, &viewport);
+	// シザー矩形
+	D3D12_RECT scissorRect = CD3DX12_RECT(0, 0, m_winApp->GetWindowWidth(), m_winApp->GetWindowHeight());
+	m_cmdList->RSSetScissorRects(1, &scissorRect);
+
 }
 
 void DirectXCommon::PostDraw() 
@@ -60,11 +69,12 @@ void DirectXCommon::PostDraw()
 	HRESULT result = S_FALSE;
 	// バックバッファの番号を取得（２つなので０番か１番）
 	UINT bbIndex = m_swapChain->GetCurrentBackBufferIndex();
+	
+	D3D12_RESOURCE_BARRIER barrierDesc = CD3DX12_RESOURCE_BARRIER::Transition(
+		m_backBuffers[bbIndex].Get(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PRESENT);
 	// リソースバリアを戻す
-	D3D12_RESOURCE_BARRIER barrierDesc = {};
-	barrierDesc.Transition.pResource = m_backBuffers[bbIndex].Get();
-	barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	m_cmdList->ResourceBarrier(1, &barrierDesc);
 
 	// 命令のクローズ
@@ -84,8 +94,10 @@ void DirectXCommon::PostDraw()
 	if (m_fence->GetCompletedValue() != mFenceVal) {
 		HANDLE event = CreateEvent(nullptr, false, false, nullptr);
 		m_fence->SetEventOnCompletion(mFenceVal, event);
-		WaitForSingleObject(event, INFINITE);
-		CloseHandle(event);
+		if (event != 0) {
+			WaitForSingleObject(event, INFINITE);
+			CloseHandle(event);
+		}
 	}
 	// キューをクリア
 	result = m_cmdAllocator->Reset();
