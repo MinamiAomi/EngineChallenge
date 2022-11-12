@@ -107,6 +107,22 @@ void DirectXCommon::PostDraw()
 	assert(SUCCEEDED(result));
 }
 
+DirectXCommon::ComPtr<ID3D12Resource> DirectXCommon::CreateResourceBuffer(UINT64 size) {
+	HRESULT result = S_FALSE;
+	ComPtr<ID3D12Resource> tmpBuffer;
+
+	D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(size);
+	// バッファの生成
+	result = m_device->CreateCommittedResource(
+		&heapProp, D3D12_HEAP_FLAG_NONE,
+		&resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr, IID_PPV_ARGS(&tmpBuffer));
+	assert(SUCCEEDED(result));
+
+	return tmpBuffer;
+}
+
 void DirectXCommon::CreateFactory()
 {
 	HRESULT result = S_FALSE;

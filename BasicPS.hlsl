@@ -1,10 +1,9 @@
+#include "Basic.hlsli"
 
-cbuffer ConstBufferData : register(b0)
-{
-    float4 color; // êF(RGBA)
-}
+Texture2D<float4> tex : register(t0);
+SamplerState smp : register(s0);
 
-float4 main() : SV_TARGET
+float4 main(VSOutput input) : SV_TARGET
 {
-    return color;
+    return float4(tex.Sample(smp, input.uv)) * color;
 }

@@ -25,7 +25,7 @@
     <ClCompile Include="include\directX\DirectXCommon.cpp">
       <Filter>Engine\ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
+    <ClCompile Include="include\input\Input.cpp">
       <Filter>Engine\ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -39,15 +39,15 @@
     <ClInclude Include="include\directX\DirectXCommon.h">
       <Filter>Engine\ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
+    <ClInclude Include="include\input\Input.h">
       <Filter>Engine\ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BasicVS.hlsl">
+    <FxCompile Include="BasicPS.hlsl">
       <Filter>Engine\リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="BasicPS.hlsl">
+    <FxCompile Include="BasicVS.hlsl">
       <Filter>Engine\リソース ファイル</Filter>
     </FxCompile>
   </ItemGroup>

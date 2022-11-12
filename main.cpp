@@ -8,6 +8,8 @@
 #include <wrl.h>
 #include <DirectXMath.h>
 
+#include <DirectXTex.h>
+
 #pragma comment(lib,"d3dcompiler.lib")
 
 using namespace DirectX;
@@ -19,9 +21,20 @@ using ComPtr = Microsoft::WRL::ComPtr<TYPE>;
 void ShalderFileLoadCheak(const HRESULT& result, ID3DBlob* errorBlob);
 #endif // _DEBUG
 
-struct ConstBufferData
+struct ConstBufferDataMaterial
 {
 	XMFLOAT4 color; // 色（RGBA）
+};
+
+struct ConstBufferDataTransform
+{
+	XMMATRIX mat; // ３D変換行列
+};
+
+struct Vertex {
+	XMFLOAT3 pos;
+	XMFLOAT2 uv;
+
 };
 
 enum BlendMode 
@@ -35,6 +48,8 @@ enum BlendMode
 };
 
 void SetBlendState(D3D12_RENDER_TARGET_BLEND_DESC& blendDesc, BlendMode blendMode = kBlendModeAlpha);
+
+void SetResourceDescTexture2DMeta(D3D12_RESOURCE_DESC& texResourceDesc, const TexMetadata& metadata);
 
 // Windowsアプリのエントリーポイント(main関数)
 int MAIN
@@ -53,24 +68,16 @@ int MAIN
 
 #pragma region 頂点データ
 
-	XMFLOAT3 vertices[] = 
-	{	{ -0.5f, -0.5f, 0.0f },
-		{ -0.5f,  0.5f, 0.0f },
-		{  0.5f, -0.5f, 0.0f }	};
+	Vertex vertices[] = 
+	{	{ {	  0.0f, 100.0f, 0.0f }, { 0.0f, 1.0f } }, 
+		{ {   0.5f,   0.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ { 100.5f, 100.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ { 100.5f,   0.0f, 0.0f }, { 1.0f, 0.0f } } };
 
-	ComPtr<ID3D12Resource> vertBuff;
-
-	D3D12_HEAP_PROPERTIES vbHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	D3D12_RESOURCE_DESC vbResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertices));
-	// 頂点バッファの生成
-	result = directXCommon->GetDevice()->CreateCommittedResource(
-		&vbHeapProp, D3D12_HEAP_FLAG_NONE,
-		&vbResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr, IID_PPV_ARGS(&vertBuff));
-	assert(SUCCEEDED(result));
+	ComPtr<ID3D12Resource> vertBuff = directXCommon->CreateResourceBuffer(sizeof(vertices));
 
 	// GPU上のバッファに対応した仮想メモリ（メインメモリ上）を取得
-	XMFLOAT3* vertMap = nullptr;
+	Vertex* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap); // マッピング
 	assert(SUCCEEDED(result));
 	// 座標をコピー
@@ -86,25 +93,158 @@ int MAIN
 
 #pragma endregion
 
+#pragma region デスクリプタヒープの生成
+
+	// デスクリプタヒープの生成
+	constexpr size_t kMaxSRVCount = 2056;
+
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	srvHeapDesc.NumDescriptors = kMaxSRVCount;
+
+	ComPtr<ID3D12DescriptorHeap> srvHeap;
+	result = directXCommon->GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap));
+	assert(SUCCEEDED(result));
+
+	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = srvHeap->GetCPUDescriptorHandleForHeapStart();
+
+#pragma endregion
+
+#pragma region テクスチャデータ
+
+	//constexpr size_t kTextureWidth = 256;
+	//constexpr size_t kTextureHeight = 256;
+	//constexpr size_t kImageDataCount = kTextureHeight * kTextureWidth;
+	//
+	//XMFLOAT4* imageData = new XMFLOAT4[kImageDataCount];
+
+	//for (size_t i = 0; i < kImageDataCount; i++) {
+	//	imageData[i].x = 1.0f;
+	//	imageData[i].y = 0.0f;
+	//	imageData[i].z = 0.0f;
+	//	imageData[i].w = 1.0f;
+	//}
+
+
+	TexMetadata metadata = {};
+	ScratchImage scratchImg = {};
+
+	result = LoadFromWICFile(L"resources/images/test.png", WIC_FLAGS_NONE, &metadata, scratchImg);
+
+
+	ScratchImage mipChain = {};
+
+	result = GenerateMipMaps(
+		scratchImg.GetImages(), scratchImg.GetImageCount(), scratchImg.GetMetadata(),
+		TEX_FILTER_DEFAULT, 0, mipChain);
+	if (SUCCEEDED(result)) {
+		scratchImg = std::move(mipChain);
+		metadata = scratchImg.GetMetadata();
+	}
+
+	metadata.format = MakeSRGB(metadata.format);
+
+
+	ComPtr<ID3D12Resource> texBuff;
+
+	D3D12_HEAP_PROPERTIES texHeapProp = {};
+	texHeapProp.Type = D3D12_HEAP_TYPE_CUSTOM;
+	texHeapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+	texHeapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+
+	D3D12_RESOURCE_DESC texResourceDesc = {};
+//		CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R32G32B32A32_FLOAT, kTextureWidth, kTextureHeight);
+//	texResourceDesc.MipLevels = 1;
+	SetResourceDescTexture2DMeta(texResourceDesc, metadata);
+	
+
+	result = directXCommon->GetDevice()->CreateCommittedResource(
+		&texHeapProp, D3D12_HEAP_FLAG_NONE, &texResourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&texBuff));
+	assert(SUCCEEDED(result));
+
+	// 全ミップマップについて
+	for (size_t i = 0; i < metadata.mipLevels; i++) {
+		// ミップマップレベルを指定してイメージを取得
+		const Image* img = scratchImg.GetImage(i, 0, 0);
+		// テクスチャバッファにデータ転送
+		result = texBuff->WriteToSubresource(
+			(UINT)i, nullptr, img->pixels,
+			(UINT)img->rowPitch, (UINT)img->slicePitch);
+		assert(SUCCEEDED(result));
+	}
+
+//	result = texBuff->WriteToSubresource(0, nullptr, imageData,
+//		sizeof(XMFLOAT4) * kTextureWidth, sizeof(XMFLOAT4) * kImageDataCount);
+//	assert(SUCCEEDED(result));
+
+
+//	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+//	srvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+//	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+//	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+//	srvDesc.Texture2D.MipLevels = 1;
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = texResourceDesc.Format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = texResourceDesc.MipLevels;
+
+	directXCommon->GetDevice()->CreateShaderResourceView(texBuff.Get(), &srvDesc, srvHandle);
+
+
+#pragma endregion
+
+
+#pragma region インデックスデータ
+
+	uint16_t indices[] =
+	{	0, 1, 2,
+		1, 2, 3   };
+
+	ComPtr<ID3D12Resource> indexBuff = directXCommon->CreateResourceBuffer(sizeof(indices));
+
+	uint16_t* indexMap = nullptr;
+	result = indexBuff->Map(0, nullptr, (void**)&indexMap);
+	for (int i = 0; i < _countof(indices); i++) {
+		indexMap[i] = indices[i];
+	}
+	indexBuff->Unmap(0, nullptr);
+
+	// インデックスバッファビューの生成
+	D3D12_INDEX_BUFFER_VIEW ibView = {};
+	// GPU仮想アドレス
+	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
+	ibView.Format = DXGI_FORMAT_R16_UINT;
+	ibView.SizeInBytes = sizeof(indices);
+
+#pragma endregion
+
 #pragma region 定数データ
 
-	ComPtr<ID3D12Resource> constBuff;
+	ComPtr<ID3D12Resource> constBuffMaterial = directXCommon->CreateResourceBuffer((sizeof(ConstBufferDataMaterial) + 0xFF) & ~0xFF);
 
-	D3D12_HEAP_PROPERTIES cbHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	D3D12_RESOURCE_DESC cbResourceDesc = CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xFF) & ~0xFF);
-	// 定数バッファの生成
-	result = directXCommon->GetDevice()->CreateCommittedResource(
-		&cbHeapProp, D3D12_HEAP_FLAG_NONE,
-		&cbResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr, IID_PPV_ARGS(&constBuff));
-	assert(SUCCEEDED(result));
-
-	ConstBufferData* constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void**)&constMap); // マッピング
+	ConstBufferDataMaterial* constMapMaterial = nullptr;
+	result = constBuffMaterial->Map(0, nullptr, (void**)&constMapMaterial); // マッピング
 	assert(SUCCEEDED(result));
 	// 値を書き込むと自動的に転送される
-	constMap->color = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.5f);
-	constBuff->Unmap(0, nullptr);
+	constMapMaterial->color = XMFLOAT4(1, 0, 0, 1);
+	constBuffMaterial->Unmap(0, nullptr);
+
+	ComPtr<ID3D12Resource> constBuffTransform = directXCommon->CreateResourceBuffer((sizeof(ConstBufferDataTransform) + 0xFF) & ~0xFF);
+
+	ConstBufferDataTransform* constMapTransform = nullptr;
+	result = constBuffTransform->Map(0, nullptr, (void**)&constMapTransform); // マッピング
+	assert(SUCCEEDED(result));
+	// 値を書き込むと自動的に転送される
+	constMapTransform->mat = XMMatrixIdentity();
+	constMapTransform->mat.r[0].m128_f32[0] = 2.0f / winApp->GetWindowWidth();
+	constMapTransform->mat.r[1].m128_f32[1] = -2.0f / winApp->GetWindowHeight();
+	constMapTransform->mat.r[3].m128_f32[0] = -1.0f;
+	constMapTransform->mat.r[3].m128_f32[1] = 1.0f;
+	constBuffTransform->Unmap(0, nullptr);
 
 #pragma endregion
 
@@ -146,6 +286,11 @@ int MAIN
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
+		{
+			"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
 	};
 
 	// グラフィックスパイプライン設定
@@ -175,9 +320,27 @@ int MAIN
 	pipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0 ~ 255指定のRGBA
 	pipelineDesc.SampleDesc.Count = 1; // １ピクセルに着き１回サンプリング
 
-	CD3DX12_ROOT_PARAMETER rootParam = {};
-	rootParam.InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+	// ディスクリプタレンジ
+	D3D12_DESCRIPTOR_RANGE descriptorRange =
+		CD3DX12_DESCRIPTOR_RANGE(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
+
+	CD3DX12_ROOT_PARAMETER rootParams[3] = {};
+	rootParams[0].InitAsConstantBufferView(0);
+	rootParams[1].InitAsDescriptorTable(1, &descriptorRange);
+	rootParams[2].InitAsConstantBufferView(1);
+
+	// テクスチャサンプラーの設定
+	D3D12_STATIC_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+	samplerDesc.MinLOD = 0.0f;
+	samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	// ルートシグネチャ
 	ComPtr<ID3D12RootSignature> rootSignature;
@@ -185,8 +348,10 @@ int MAIN
 	// ルートシグネチャ設定
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	rootSignatureDesc.pParameters = &rootParam; // ルートパラメータの先頭アドレス
-	rootSignatureDesc.NumParameters = 1;		// ルートパラメータの数
+	rootSignatureDesc.pParameters = rootParams; // ルートパラメータの先頭アドレス
+	rootSignatureDesc.NumParameters = _countof(rootParams);		// ルートパラメータの数
+	rootSignatureDesc.pStaticSamplers = &samplerDesc;
+	rootSignatureDesc.NumStaticSamplers = 1;
 
 	// ルートシグネチャのシリアライズ
 	ComPtr<ID3DBlob> rootSigBlob;
@@ -222,29 +387,47 @@ int MAIN
 			xspeed = -xspeed;
 		}
 
-		result = constBuff->Map(0, nullptr, (void**)&constMap); // マッピング
+		result = constBuffMaterial->Map(0, nullptr, (void**)&constMapMaterial); // マッピング
 		assert(SUCCEEDED(result));
 		// 値を書き込むと自動的に転送される
-		constMap->color = XMFLOAT4(x, (1.0f - x), 0.0f, 0.5f);
-		constBuff->Unmap(0, nullptr);
+		constMapMaterial->color = XMFLOAT4(x, (1.0f - x), 0.0f, 0.5f);
+		constBuffMaterial->Unmap(0, nullptr);
 		
 
 		directXCommon->GetCommandList()->SetPipelineState(pipelineState.Get());
 		directXCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-		directXCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		directXCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		directXCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vbView);
-		directXCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
-		directXCommon->GetCommandList()->DrawInstanced(_countof(vertices), 1, 0, 0);
+		directXCommon->GetCommandList()->IASetIndexBuffer(&ibView);
+		directXCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, constBuffMaterial->GetGPUVirtualAddress());
+		
+		directXCommon->GetCommandList()->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
+		D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
+		directXCommon->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvGpuHandle);
+		
+		directXCommon->GetCommandList()->SetGraphicsRootConstantBufferView(2, constBuffTransform->GetGPUVirtualAddress());
+		
+		directXCommon->GetCommandList()->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
 		
 
 		directXCommon->PostDraw();
 	}
+
 
 	winApp->Finalize();
 
 	return 0;
 }
 
+void SetResourceDescTexture2DMeta(D3D12_RESOURCE_DESC& texResourceDesc, const TexMetadata& metadata) {
+	texResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	texResourceDesc.Format = metadata.format;
+	texResourceDesc.Width = metadata.width;
+	texResourceDesc.Height = (UINT)metadata.height;
+	texResourceDesc.DepthOrArraySize = (UINT16)metadata.arraySize;
+	texResourceDesc.MipLevels = (UINT16)metadata.mipLevels;
+	texResourceDesc.SampleDesc.Count = 1;
+}
 
 void SetBlendState(D3D12_RENDER_TARGET_BLEND_DESC& blendDesc, BlendMode blendMode) {
 	blendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; // RGBAすべてのチャンネルを描画

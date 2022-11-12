@@ -1,9 +1,16 @@
 
-
-float2 Rotated(float2 pos, float theta)
+cbuffer ConstBufferDataMaterial : register(b0)
 {
-    float2 tmp;
-    tmp.x = pos.x * cos(theta) - pos.y * sin(theta);
-    tmp.y = pos.x * sin(theta) + pos.y * cos(theta);
-    return tmp;
+    float4 color; // F(RGBA)
 }
+
+cbuffer ConstBufferDataTransform : register(b1)
+{
+    matrix mat; // À•W•ÏŠ·s—ñ
+}
+
+struct VSOutput
+{
+    float4 svpos : SV_Position;
+    float2 uv : TEXCOORD;
+};

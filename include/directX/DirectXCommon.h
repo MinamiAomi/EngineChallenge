@@ -47,6 +47,11 @@ public:
 	void Initialize(WinApp* winApp);
 	void PreDraw();
 	void PostDraw();
+	
+	/// <summary>
+	/// 頂点バッファや定数バッファの生成
+	/// </summary>
+	ComPtr<ID3D12Resource> CreateResourceBuffer(UINT64 size);
 
 private:
 	DirectXCommon() = default;
