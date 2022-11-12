@@ -7,6 +7,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <vector>
+#include "Vector4.h"
 
 class DirectXCommon 
 {
@@ -30,7 +31,7 @@ private:
 
 	UINT64 mFenceVal = 0;
 
-	FLOAT clearColor[4] = { 0.1f,0.25f,0.5f,0.0f };
+	Vector4 clearColor = { 0.1f,0.25f,0.5f,0.0f };
 
 
 public: // ê√ìIÉÅÉìÉoä÷êî
@@ -43,6 +44,7 @@ public:
 	inline IDXGISwapChain4* GetSwapChain() { return m_swapChain.Get(); }
 	inline ID3D12Resource* GetBackBaffer(int i) { return m_backBuffers[i].Get(); }
 
+	inline void SetClearColor(const Vector4& color) { clearColor = color; }
 
 	void Initialize(WinApp* winApp);
 	void PreDraw();

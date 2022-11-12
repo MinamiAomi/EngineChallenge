@@ -52,7 +52,8 @@ void DirectXCommon::PreDraw()
 	m_cmdList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
 
 	// 画面クリア
-	m_cmdList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	FLOAT clearcolor[] = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
+	m_cmdList->ClearRenderTargetView(rtvHandle, clearcolor, 0, nullptr);
 
 	// ビューポート
 	D3D12_VIEWPORT viewport = 

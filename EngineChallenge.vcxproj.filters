@@ -16,6 +16,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{95fa97da-d6ea-49a2-9bab-3b9320034d48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Vector">
+      <UniqueIdentifier>{8079421d-66df-4d7a-9a0c-4ab0ba0e2a69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -42,6 +48,15 @@
     <ClInclude Include="include\input\Input.h">
       <Filter>Engine\ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>Math\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>Math\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\math\Vector4.h">
+      <Filter>Math\Vector</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BasicPS.hlsl">
@@ -50,9 +65,18 @@
     <FxCompile Include="BasicVS.hlsl">
       <Filter>Engine\リソース ファイル</Filter>
     </FxCompile>
+    <FxCompile Include="ShapeVS.hlsl">
+      <Filter>Engine\リソース ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="ShapePS.hlsl">
+      <Filter>Engine\リソース ファイル</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.hlsli">
+      <Filter>Engine\リソース ファイル</Filter>
+    </None>
+    <None Include="Shape.hlsli">
       <Filter>Engine\リソース ファイル</Filter>
     </None>
   </ItemGroup>
