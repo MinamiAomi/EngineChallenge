@@ -149,17 +149,28 @@
     <ClCompile Include="include\directX\DirectXCommon.cpp" />
     <ClCompile Include="include\input\Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PipelineBase.cpp" />
+    <ClCompile Include="ShapePipeline.cpp" />
+    <ClCompile Include="SpritePipeline.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConstBuffer.h" />
     <ClInclude Include="include\base\WinApp.h" />
     <ClInclude Include="include\directX\d3dx12.h" />
     <ClInclude Include="include\directX\DirectXCommon.h" />
     <ClInclude Include="include\input\Input.h" />
     <ClInclude Include="include\math\Vector4.h" />
+    <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="Matrix33.h" />
+    <ClInclude Include="Matrix44.h" />
+    <ClInclude Include="PipelineBase.h" />
+    <ClInclude Include="ShapePipeline.h" />
+    <ClInclude Include="SpritePipeline.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
+    <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -184,10 +195,23 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="SpritePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="SpriteVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.hlsli" />
     <None Include="Shape.hlsli" />
+    <None Include="Sprite.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -33,11 +33,10 @@ private: // ƒƒ“ƒo•Ï”
 
 public: // ƒƒ“ƒoŠÖ”
 	static TextureManager* GetInstance();
-
+	static UINT LoadTexture(const wchar_t* filepath);
 
 	void Initialize(DirectXCommon* dixCom);
 	void ResetAll();
-	UINT LoadTexture(const wchar_t* filepath);
 
 	void SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* cmdlist, UINT rootParamIndex, UINT texNumber);
 private:
@@ -46,6 +45,5 @@ private:
 	TextureManager(const TextureManager&) = delete;
 	const TextureManager& operator=(const TextureManager&) = delete;
 
-
-
+	UINT LoadTexturePri(const wchar_t* filepath);
 };

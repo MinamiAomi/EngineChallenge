@@ -8,6 +8,7 @@ public:
 	TYPE x;	// x¬•ª
 	TYPE y; // y¬•ª
 
+
 public:
 	Twins() {}
 	Twins(const TYPE& x, const TYPE& y) : x(x), y(y) {}

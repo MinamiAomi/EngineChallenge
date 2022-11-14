@@ -3,28 +3,20 @@
 #include <cassert>
 #include <DirectXTex.h>
 #include <d3dx12.h>
-#include <d3dcompiler.h>
 
-#pragma comment(lib,"d3dcompiler.lib")
 
 
 using namespace DirectX;
-
-void SetResourceDescTexture2DMeta(D3D12_RESOURCE_DESC& texResourceDesc, const TexMetadata& metadata) {
-	texResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	texResourceDesc.Format = metadata.format;
-	texResourceDesc.Width = metadata.width;
-	texResourceDesc.Height = (UINT)metadata.height;
-	texResourceDesc.DepthOrArraySize = (UINT16)metadata.arraySize;
-	texResourceDesc.MipLevels = (UINT16)metadata.mipLevels;
-	texResourceDesc.SampleDesc.Count = 1;
-}
-
 
 TextureManager* TextureManager::GetInstance() 
 {
 	static TextureManager instance;
 	return &instance;
+}
+
+UINT TextureManager::LoadTexture(const wchar_t* filepath)
+{
+	return GetInstance()->LoadTexturePri(filepath);
 }
 
 void TextureManager::Initialize(DirectXCommon* dixCom)
@@ -57,7 +49,7 @@ void TextureManager::ResetAll()
 	m_nextLoadIndex = 0;
 }
 
-UINT TextureManager::LoadTexture(const wchar_t* filepath)
+UINT TextureManager::LoadTexturePri(const wchar_t* filepath)
 {
 	assert(m_nextLoadIndex < kDescriptorCount);
 

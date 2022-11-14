@@ -60,4 +60,5 @@ public:
 	Vector3(const Vector3& v) : Triplet(v.x, v.y, v.z) {}
 	Vector3(const Vector2& v2, float z) : Triplet(v2, z) {}
 	~Vector3() {}
+
 };
