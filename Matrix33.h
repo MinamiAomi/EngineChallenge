@@ -94,16 +94,16 @@ public:
 	}
 
 	// 単位行列
-	static inline Matrix33 MakeIdentity() {
+	static inline Matrix33 CreateIdentity() {
 		return {
 			1.0f,		0.0f,		0.0f,
 			0.0f,		1.0f,		0.0f,
 			0.0f,		0.0f,		1.0f
 		};
 	}
-	// Make関数
+	// Create関数
 		// 拡大縮小行列
-	static inline Matrix33 MakeScaling(float scaleX, float scaleY) {
+	static inline Matrix33 CreateScaling(float scaleX, float scaleY) {
 		return {
 			scaleX, 0.0f,		0.0f,
 			0.0f,		scaleY,	0.0f,
@@ -111,15 +111,15 @@ public:
 		};
 	}
 	// 拡大縮小行列
-	static inline Matrix33 MakeScaling(float scale) {
-		return MakeScaling(scale, scale);
+	static inline Matrix33 CreateScaling(float scale) {
+		return CreateScaling(scale, scale);
 	}
 	// 拡大縮小行列
-	static inline Matrix33 MakeScaling(const Vector2& scale) {
-		return MakeScaling(scale.x, scale.y);
+	static inline Matrix33 CreateScaling(const Vector2& scale) {
+		return CreateScaling(scale.x, scale.y);
 	}
 	// 回転行列
-	static inline Matrix33 MakeRotation(float theta) {
+	static inline Matrix33 CreateRotation(float theta) {
 		float s = sinf(theta);
 		float c = cosf(theta);
 		return {
@@ -129,7 +129,7 @@ public:
 		};
 	}
 	// 平行移動行列
-	static inline Matrix33 MakeTranslation(float vecX, float vecY) {
+	static inline Matrix33 CreateTranslation(float vecX, float vecY) {
 		return {
 			1.0f,	0.0f,	0.0f,
 			0.0f,	1.0f,	0.0f,
@@ -137,11 +137,11 @@ public:
 		};
 	}
 	// 平行移動行列
-	static inline Matrix33 MakeTranslation(const Vector2& vector) {
-		return MakeTranslation(vector.x, vector.y);
+	static inline Matrix33 CreateTranslation(const Vector2& vector) {
+		return CreateTranslation(vector.x, vector.y);
 	}
 	// アフィン変換行列
-	static inline Matrix33 MakeAffine(float scaleX, float scaleY, float theta, float vecX, float vecY) {
+	static inline Matrix33 CreateAffine(float scaleX, float scaleY, float theta, float vecX, float vecY) {
 		float s = sinf(theta);
 		float c = cosf(theta);
 		return {
@@ -151,20 +151,20 @@ public:
 		};
 	}
 	// アフィン変換行列
-	static inline Matrix33 MakeAffine(float scale, float theta, const Vector2& vec) {
-		return MakeAffine(scale, scale, theta, vec.x, vec.y);
+	static inline Matrix33 CreateAffine(float scale, float theta, const Vector2& vec) {
+		return CreateAffine(scale, scale, theta, vec.x, vec.y);
 	}
 	// アフィン変換行列
-	static inline Matrix33 MakeAffine(const Vector2& scale, float theta, const Vector2& vec) {
-		return MakeAffine(scale.x, scale.y, theta, vec.x, vec.y);
+	static inline Matrix33 CreateAffine(const Vector2& scale, float theta, const Vector2& vec) {
+		return CreateAffine(scale.x, scale.y, theta, vec.x, vec.y);
 	}
 
-	static inline Matrix33 MakeInverse(const Matrix33& matrix) {
+	static inline Matrix33 CreateInverse(const Matrix33& matrix) {
 		return matrix.Inverse();
 	}
 
 	void SetIdentity() {
-		*this = MakeIdentity();
+		*this = CreateIdentity();
 	}
 
 	// 変換行列との掛け算(効率的)

@@ -9,13 +9,13 @@ public:
 	// 頂点構造体
 	struct Vertex
 	{
-		XMFLOAT3 pos; // 座標
-		XMFLOAT4 color;
+		Vector3 pos; // 座標
+		Vector4 color;
 	};
 
 	struct ConstBufferData
 	{
-		XMMATRIX mat;	// 変換行列
+		Matrix44 mat;	// 変換行列
 	};
 
 public:

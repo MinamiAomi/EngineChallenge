@@ -111,6 +111,9 @@
     <ClInclude Include="Matrix44.h">
       <Filter>Math\Vector</Filter>
     </ClInclude>
+    <ClInclude Include="MathUtility.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BasicPS.hlsl">

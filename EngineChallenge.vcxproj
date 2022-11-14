@@ -162,6 +162,7 @@
     <ClInclude Include="include\input\Input.h" />
     <ClInclude Include="include\math\Vector4.h" />
     <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="MathUtility.h" />
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="PipelineBase.h" />

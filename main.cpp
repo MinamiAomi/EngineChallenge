@@ -8,7 +8,7 @@
 #include "IndexBuffer.h"
 #include "ConstBuffer.h"
 
-
+#include "MathUtility.h"
 
 
 #include <DirectXMath.h>
@@ -20,40 +20,19 @@ using namespace DirectX;
 
 
 struct TransForm {
-	XMFLOAT3 position;
-	XMFLOAT3 scale;
-	XMFLOAT3 angle;
-	XMMATRIX worldMat;
-
-	TransForm() {
-		position = XMFLOAT3{ 0,0,0 };
-		scale = XMFLOAT3{ 0,0,0 };
-		angle = XMFLOAT3{ 0,0,0 };
-		worldMat = XMMatrixIdentity();
-	}
+	Vector3 position;
+	Vector3 scale;
+	Vector3 angle;
+	Matrix44 worldMat;
 
 	void CalcTransFormMatrix() {
-		XMMATRIX transMat = XMMatrixTranslation(position.x, position.y, position.z);
-		XMMATRIX rotateMat = XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
-		XMMATRIX scaleMat = XMMatrixScaling(scale.x, scale.y, scale.z);
+		Matrix44 transMat = Matrix44::CreateTranslation(position);
+		Matrix44 rotateMat = Matrix44::CreateRotationXYZ(angle);
+		Matrix44 scaleMat = Matrix44::CreateScaling(scale);
 
 		worldMat = scaleMat * rotateMat * transMat;
 	}
 };
-
-XMFLOAT3 operator-(const XMFLOAT3& a, const XMFLOAT3& b) {
-	return { a.x - b.x,a.y - b.y,a.z - b.z };
-}
-
-float length(const XMFLOAT3& a) {
-	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
-}
-
-XMFLOAT3 normalize(const XMFLOAT3& a) {
-	float len = length(a);
-	return { a.x / len, a.y / len, a.z / len };
-}
-
 
 
 // Windowsアプリのエントリーポイント(main関数)
@@ -90,14 +69,14 @@ int MAIN
 		unsigned short index1 = indices[i * 3 + 1];
 		unsigned short index2 = indices[i * 3 + 2];
 
-		XMVECTOR p0 = XMLoadFloat3(&vertices[index0].pos);
-		XMVECTOR p1 = XMLoadFloat3(&vertices[index1].pos);
-		XMVECTOR p2 = XMLoadFloat3(&vertices[index2].pos);
+		Vector3 p0 = XMLoadFloat3(&vertices[index0].pos);
+		Vector3 p1 = XMLoadFloat3(&vertices[index1].pos);
+		Vector3 p2 = XMLoadFloat3(&vertices[index2].pos);
 
-		XMVECTOR v1 = XMVectorSubtract(p1, p0);
-		XMVECTOR v2 = XMVectorSubtract(p2, p0);
+		Vector3 v1 = XMVectorSubtract(p1, p0);
+		Vector3 v2 = XMVectorSubtract(p2, p0);
 
-		XMVECTOR normal = XMVector3Cross(v1, v2);
+		Vector3 normal = XMVector3Cross(v1, v2);
 		normal = XMVector3Normalize(normal);
 
 		XMStoreFloat3(&vertices[index0].normal, normal);
@@ -177,23 +156,31 @@ int MAIN
 #pragma region カメラ行列
 
 	// プロジェクション行列
-	XMMATRIX projectionMat;
-	float fovAngleY = XMConvertToRadians(45.0f);	// 上下画角
+	Matrix44 projectionMat;
+	float fovAngleY = Math::ToRadians(45.0f);	// 上下画角
 	float aspectRatio = (float)winApp->GetWindowWidth() / (float)winApp->GetWindowHeight();  // アスペクト比
 	float nearZ = 0.1f;			// 前端
 	float farZ = 1000.0f;		// 奥端
 
 	// ビュー行列
-	XMMATRIX viewMat;
-	XMFLOAT3 eye(-200 * sinf(0), 100, -200 * cosf(0));	// 視点座標
-	XMFLOAT3 target(0, 0, 0);	// 注視点座標
-	XMFLOAT3 up(0, 1, 0);		// 上方向ベクトル
+	Matrix44 viewMat;
+	Vector3 eye(-200 * sinf(0), 100, -200 * cosf(0));	// 視点座標
+	Vector3 target(0, 0, 0);	// 注視点座標
+	Vector3 up(0, 1, 0);		// 上方向ベクトル
+
+	XMVECTOR xeye = XMVECTOR{ eye.x,eye.y,eye.z };
+	XMVECTOR xtarget = XMVECTOR{ target.x,target.y,target.z };
+	XMVECTOR xup = XMVECTOR{ up.x,up.y,up.z };
 
 	// 透視投影行列の計算
-	projectionMat = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
+	projectionMat = Matrix44::CreateProjection(fovAngleY, aspectRatio, nearZ, farZ);
 	// ビュー変換行列
-	viewMat = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+	viewMat = Matrix44::CreateView(eye, target, up);
 
+	XMMATRIX newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
+	XMMATRIX newview = XMMatrixLookAtLH(xeye, xtarget, xup);
+	Matrix44 aa = viewMat * projectionMat;
+	XMMATRIX a = newview * newproj;
 
 	// 並行投影行列の計算
 	//projectionMat = XMMatrixOrthographicOffCenterLH(
@@ -211,11 +198,11 @@ int MAIN
 	const UINT kSpriteCount = 2;
 
 	TransForm spriteTrans[kSpriteCount];
-	spriteTrans[0].scale = XMFLOAT3(5, 5, 5);
-	spriteTrans[1].scale = XMFLOAT3(5, 10, 5);
+	spriteTrans[0].scale = Vector3(5, 5, 5);
+	spriteTrans[1].scale = Vector3(5, 10, 5);
 
-	spriteTrans[1].position = XMFLOAT3(100, -50, 20);
-	spriteTrans[1].angle = XMFLOAT3(0, XMConvertToRadians(45.0f), XMConvertToRadians(30.0f));
+	spriteTrans[1].position = Vector3(100, -50, 20);
+	spriteTrans[1].angle = Vector3(0, XMConvertToRadians(45.0f), XMConvertToRadians(30.0f));
 
 	ConstBuffer<SpritePipeline::ConstBufferData> spriteConstBuffer[kSpriteCount];
 	for (auto& it : spriteConstBuffer) {
@@ -234,9 +221,9 @@ int MAIN
 	const int kLineNum = 3;
 
 	float axisScale = 1000.0f;
-	XMFLOAT4 xColor = { 1.0f,0.0f,0.0f,1.0f };
-	XMFLOAT4 yColor = { 0.0f,1.0f,0.0f,1.0f };
-	XMFLOAT4 zColor = { 0.0f,0.0f,1.0f,1.0f };
+	Vector4 xColor = { 1.0f,0.0f,0.0f,1.0f };
+	Vector4 yColor = { 0.0f,1.0f,0.0f,1.0f };
+	Vector4 zColor = { 0.0f,0.0f,1.0f,1.0f };
 	ShapePipeline::Vertex axis[kLineNum][kLineVertexCount] =
 	{	{ { {axisScale,0.0f,0.0f}, xColor },{ {-axisScale,0.0f,0.0f}, xColor } },
 		{ { {0.0f,axisScale,0.0f}, yColor },{ {0.0f,-axisScale,0.0f}, yColor } },
@@ -311,10 +298,10 @@ int MAIN
 
 		target = spriteTrans[n].position;
 
-		// ビュー変換行列
-		viewMat = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 		// 透視投影行列の計算
-		projectionMat = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
+		projectionMat = Matrix44::CreateProjection(fovAngleY, aspectRatio, nearZ, farZ);
+		// ビュー変換行列
+		viewMat = Matrix44::CreateView(eye, target, up);
 
 
 		// 軸描画
@@ -336,7 +323,7 @@ int MAIN
 			spriteTrans[i].CalcTransFormMatrix();
 
 			spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].worldMat * viewMat * projectionMat;
-			spriteConstBuffer[i].MapPtr()->color = XMFLOAT4{ 1,1,1,1 };
+			spriteConstBuffer[i].MapPtr()->color = Vector4{ 1,1,1,1 };
 
 			spritePipeline->SetPipelineState(directXCommon->GetCommandList(), kBlendModeAlpha);
 			directXCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

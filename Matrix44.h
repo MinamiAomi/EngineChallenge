@@ -52,29 +52,34 @@ public:
 		return *this;
 	}
 
+	friend inline Vector3 operator*(const Vector3& vec, const Matrix44& mat) {
+		return{
+			vec.x * mat.m[0][0] + vec.y * mat.m[1][0] + vec.z * mat.m[2][0] + mat.m[3][0],
+			vec.x * mat.m[0][1] + vec.y * mat.m[1][1] + vec.z * mat.m[2][1] + mat.m[3][1],
+			vec.x * mat.m[0][2] + vec.y * mat.m[1][2] + vec.z * mat.m[2][2] + mat.m[3][2] };
+	}
 
-
-	static inline Matrix44 MakeIdentity() {
+	static inline Matrix44 CreateIdentity() {
 		return{ 1.0f, 0.0f, 0.0f, 0.0f,
 				0.0f, 1.0f, 0.0f, 0.0f,
 				0.0f, 0.0f, 1.0f, 0.0f,
 				0.0f, 0.0f, 0.0f, 1.0f };
 	}
 
-	static inline Matrix44 MakeScaling(float scaleX, float scaleY, float scaleZ) {
+	static inline Matrix44 CreateScaling(float scaleX, float scaleY, float scaleZ) {
 		return{ scaleX,		0.0f,		0.0f,		0.0f,
 				0.0f,		scaleY,		0.0f,		0.0f,
 				0.0f,		0.0f,		scaleZ,		0.0f,
 				0.0f,		0.0f,		0.0f,		1.0f };
 	}
-	static inline Matrix44 MakeScaling(float scale) {
-		return MakeScaling(scale, scale, scale);
+	static inline Matrix44 CreateScaling(float scale) {
+		return CreateScaling(scale, scale, scale);
 	};
-	static inline Matrix44 MakeScaling(const Vector3& scale) {
-		return MakeScaling(scale.x, scale.y, scale.z);
+	static inline Matrix44 CreateScaling(const Vector3& scale) {
+		return CreateScaling(scale.x, scale.y, scale.z);
 	}
 	
-	static inline Matrix44 MakeRotationX(float theta) {
+	static inline Matrix44 CreateRotationX(float theta) {
 		float c = cosf(theta);
 		float s = sinf(theta);
 		return{ 1.0f,		0.0f,		0.0f,		0.0f,
@@ -82,7 +87,7 @@ public:
 				0.0f,		-s,			c,			0.0f,
 				0.0f,		0.0f,		0,			1.0f };
 	}
-	static inline Matrix44 MakeRotationY(float theta) {
+	static inline Matrix44 CreateRotationY(float theta) {
 		float c = cosf(theta);
 		float s = sinf(theta);
 		return{ c,			0.0f,		-s,			0.0f,
@@ -90,7 +95,7 @@ public:
 				s,			0.0f,		c,			0.0f,
 				0.0f,		0.0f,		0,			1.0f };
 	}
-	static inline Matrix44 MakeRotationZ(float theta) {
+	static inline Matrix44 CreateRotationZ(float theta) {
 		float c = cosf(theta);
 		float s = sinf(theta);
 		return{ c,			s,			0.0f,		0.0f,
@@ -98,16 +103,60 @@ public:
 				0.0f,		0.0f,		1.0f,		0.0f,
 				0.0f,		0.0f,		0,			1.0f };
 	}
+	static inline Matrix44 CreateRotationXYZ(float thetaX, float thetaY, float thetaZ) {
+		return CreateRotationX(thetaX) * CreateRotationY(thetaY) * CreateRotationZ(thetaZ);
+	}
+	static inline Matrix44 CreateRotationXYZ(const Vector3& theta) {
+		return CreateRotationXYZ(theta.x, theta.y, theta.z);
+	}
 
-	static inline Matrix44 MakeTranslation(float x, float y, float z) {
+	static inline Matrix44 CreateRotationZXY(float thetaX, float thetaY, float thetaZ) {
+		return CreateRotationZ(thetaZ) * CreateRotationX(thetaX) * CreateRotationY(thetaY);
+	}
+	static inline Matrix44 CreateRotationZXY(const Vector3& theta) {
+		return CreateRotationXYZ(theta.x, theta.y, theta.z);
+	}
+
+
+	static inline Matrix44 CreateTranslation(float x, float y, float z) {
 		return{ 1.0f,	0.0f,	0.0f,	0.0f,
 				0.0f,	1.0f,	0.0f,	0.0f,
 				0.0f,	0.0f,	1.0f,	0.0f,
 				x,		y,		z,		1.0f };
 	}
-	static inline Matrix44 MakeTranslation(const Vector3& trans) {
-		return MakeTranslation(trans.x, trans.y, trans.z);
+	static inline Matrix44 CreateTranslation(const Vector3& trans) {
+		return CreateTranslation(trans.x, trans.y, trans.z);
 	}
 
 
+
+	static inline Matrix44 CreateView(const Vector3& eye, const Vector3& target, const Vector3& up) {
+		Vector3 z = Normalize(target - eye);
+		Vector3 x = Normalize(Cross(up, z));
+		Vector3 y = Cross(z, x);
+		Vector3 w = { -Dot(x,eye),-Dot(y,eye),-Dot(z,eye) };
+		return{
+			x.x,y.x,z.x,0.0f,
+			x.y,y.y,z.y,0.0f,
+			x.z,y.z,z.z,0.0f,
+			w.x,w.y,w.z,1.0f };
+	}
+
+	static inline Matrix44 CreateProjection(float fovY, float aspect, float nearZ, float farZ) {
+		float s = 1.0f / tanf(fovY / 2.0f);
+		float a = farZ / (farZ - nearZ);
+		return {
+			 s / aspect,	0.0f,		0.0f,			0.0f ,
+			 0.0f,			s,			0.0f,			0.0f ,
+			 0.0f,			0.0f,		a,				1.0f ,
+			 0.0f,			0.0f,		a * -nearZ,		0.0f };
+	}
+
+	static inline Matrix44 CreateOrthoProjection(float width, float height, float nearZ = 0.0f, float farZ = 1.0f) {
+		return {
+			 2.0f / width,	0.0f,				0.0f,					0.0f,
+			 0.0f,			-2.0f / height,		0.0f,					0.0f,
+			 0.0f,			0.0f,				1.0f / (farZ - nearZ),	0.0f,
+			 0.0f,			0.0f,				nearZ / (nearZ - farZ),	1.0f };
+	}
 };

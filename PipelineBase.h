@@ -1,6 +1,6 @@
 #pragma once
 #include "DirectXCommon.h"
-#include <DirectXMath.h>
+#include "MathUtility.h"
 
 enum BlendMode
 {
@@ -22,11 +22,6 @@ protected:
 	template<class TYPE>
 	using ComPtr = Microsoft::WRL::ComPtr<TYPE>;
 
-	using XMFLOAT2 = DirectX::XMFLOAT2;
-	using XMFLOAT3 = DirectX::XMFLOAT3;
-	using XMFLOAT4 = DirectX::XMFLOAT4;
-	using XMVECTOR = DirectX::XMVECTOR;
-	using XMMATRIX = DirectX::XMMATRIX;
 
 protected:
 	ComPtr<ID3D12PipelineState> m_pipelineState[kBlendModeCount];
