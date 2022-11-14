@@ -31,6 +31,7 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	CreateCommand();
 	CreateSwapChain();
 	CreateRenderTargetView();
+	CreateDepthBuffer();
 	CreateFence();
 }
 
@@ -49,20 +50,32 @@ void DirectXCommon::PreDraw()
 	// レンダーターゲットビューのハンドルを取得
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
 	rtvHandle.ptr += bbIndex * m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	m_cmdList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
-
+	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
+	m_cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+	
 	// 画面クリア
-	FLOAT clearcolor[] = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
+	FLOAT clearcolor[] = { m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w };
 	m_cmdList->ClearRenderTargetView(rtvHandle, clearcolor, 0, nullptr);
+	m_cmdList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// ビューポート
-	D3D12_VIEWPORT viewport = 
-		CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(m_winApp->GetWindowWidth()), static_cast<float>(m_winApp->GetWindowHeight()));
-	m_cmdList->RSSetViewports(1, &viewport);
+	SetViewport(0.0f, 0.0f, static_cast<float>(m_winApp->GetWindowWidth()), static_cast<float>(m_winApp->GetWindowHeight()));
 	// シザー矩形
-	D3D12_RECT scissorRect = CD3DX12_RECT(0, 0, m_winApp->GetWindowWidth(), m_winApp->GetWindowHeight());
-	m_cmdList->RSSetScissorRects(1, &scissorRect);
+	SetScissorRect(0, 0, m_winApp->GetWindowWidth(), m_winApp->GetWindowHeight());
 
+}
+
+void DirectXCommon::SetViewport(float left, float top, float width, float height) {
+	// ビューポート
+	D3D12_VIEWPORT viewport =
+		CD3DX12_VIEWPORT(left, top, width, height);
+	m_cmdList->RSSetViewports(1, &viewport);
+}
+void DirectXCommon::SetScissorRect(int left, int top, int right, int bottom) {
+	// シザー矩形
+	D3D12_RECT scissorRect = CD3DX12_RECT(left, top, right, bottom);
+	m_cmdList->RSSetScissorRects(1, &scissorRect);
 }
 
 void DirectXCommon::PostDraw() 
@@ -91,10 +104,10 @@ void DirectXCommon::PostDraw()
 	assert(SUCCEEDED(result));
 
 	// コマンドの実行完了を待つ
-	m_cmdQueue->Signal(m_fence.Get(), ++mFenceVal);
-	if (m_fence->GetCompletedValue() != mFenceVal) {
+	m_cmdQueue->Signal(m_fence.Get(), ++m_fenceVal);
+	if (m_fence->GetCompletedValue() != m_fenceVal) {
 		HANDLE event = CreateEvent(nullptr, false, false, nullptr);
-		m_fence->SetEventOnCompletion(mFenceVal, event);
+		m_fence->SetEventOnCompletion(m_fenceVal, event);
 		if (event != 0) {
 			WaitForSingleObject(event, INFINITE);
 			CloseHandle(event);
@@ -265,10 +278,42 @@ void DirectXCommon::CreateRenderTargetView()
 	}
 }
 
+void DirectXCommon::CreateDepthBuffer() {
+	HRESULT result = S_FALSE;
+
+	CD3DX12_RESOURCE_DESC depthResourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+		DXGI_FORMAT_D32_FLOAT, m_winApp->GetWindowWidth(), m_winApp->GetWindowHeight(), 1, 0, 1, 0,
+		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+	CD3DX12_HEAP_PROPERTIES depthHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
+	CD3DX12_CLEAR_VALUE depthClearValue = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_D32_FLOAT, 1.0f, 0);
+
+	result = m_device->CreateCommittedResource(
+		&depthHeapProp,	D3D12_HEAP_FLAG_NONE,
+		&depthResourceDesc,	D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&depthClearValue, IID_PPV_ARGS(&m_depthBuff));
+	assert(SUCCEEDED(result));
+
+	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+	dsvHeapDesc.NumDescriptors = 1;
+	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	result = m_device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_dsvHeap));
+	assert(SUCCEEDED(result));
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	m_device->CreateDepthStencilView(
+		m_depthBuff.Get(), &dsvDesc, m_dsvHeap->GetCPUDescriptorHandleForHeapStart());
+
+
+}
+
 void DirectXCommon::CreateFence()
 {
 	HRESULT result = S_FALSE;
-	result = m_device->CreateFence(mFenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
+	result = m_device->CreateFence(m_fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
 	assert(SUCCEEDED(result));
 }
 

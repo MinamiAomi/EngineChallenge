@@ -34,6 +34,9 @@
     <ClCompile Include="include\input\Input.cpp">
       <Filter>Engine\ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Engine\ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\base\WinApp.h">
@@ -56,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="include\math\Vector4.h">
       <Filter>Math\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Engine\ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

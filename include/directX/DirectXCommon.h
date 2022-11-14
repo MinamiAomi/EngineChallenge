@@ -26,12 +26,14 @@ private:
 	ComPtr<ID3D12CommandQueue>			 m_cmdQueue;
 	ComPtr<IDXGISwapChain4>				 m_swapChain;
 	std::vector< ComPtr<ID3D12Resource>> m_backBuffers;
+	ComPtr<ID3D12Resource>				 m_depthBuff;
 	ComPtr<ID3D12Fence>					 m_fence;
 	ComPtr<ID3D12DescriptorHeap>		 m_rtvHeap;
+	ComPtr<ID3D12DescriptorHeap>		 m_dsvHeap;
 
-	UINT64 mFenceVal = 0;
+	UINT64 m_fenceVal = 0;
 
-	Vector4 clearColor = { 0.1f,0.25f,0.5f,0.0f };
+	Vector4 m_clearColor = { 0.1f,0.25f,0.5f,0.0f };
 
 
 public: // ê√ìIÉÅÉìÉoä÷êî
@@ -44,7 +46,9 @@ public:
 	inline IDXGISwapChain4* GetSwapChain() { return m_swapChain.Get(); }
 	inline ID3D12Resource* GetBackBaffer(int i) { return m_backBuffers[i].Get(); }
 
-	inline void SetClearColor(const Vector4& color) { clearColor = color; }
+	inline void SetClearColor(const Vector4& color) { m_clearColor = color; }
+	void SetViewport(float left, float top, float width, float height);
+	void SetScissorRect(int left, int top, int right, int bottom);
 
 	void Initialize(WinApp* winApp);
 	void PreDraw();
@@ -66,6 +70,7 @@ private:
 	void CreateCommand();
 	void CreateSwapChain();
 	void CreateRenderTargetView();
+	void CreateDepthBuffer();
 	void CreateFence();
 
 #ifdef _DEBUG

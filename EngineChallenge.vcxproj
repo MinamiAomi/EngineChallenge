@@ -149,6 +149,7 @@
     <ClCompile Include="include\directX\DirectXCommon.cpp" />
     <ClCompile Include="include\input\Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\base\WinApp.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="include\directX\DirectXCommon.h" />
     <ClInclude Include="include\input\Input.h" />
     <ClInclude Include="include\math\Vector4.h" />
+    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
