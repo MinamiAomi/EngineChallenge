@@ -214,7 +214,6 @@ int MAIN
 
 #pragma endregion
 
-
 #pragma region Ž²
 
 	const int kLineVertexCount = 2;
