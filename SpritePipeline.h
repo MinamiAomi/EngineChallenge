@@ -1,6 +1,5 @@
 #pragma once
 #include "PipelineBase.h"
-#include <DirectXMath.h>
 
 class SpritePipeline :
 	public PipelineBase 
