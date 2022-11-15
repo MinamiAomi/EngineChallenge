@@ -25,13 +25,26 @@ struct TransForm {
 	Vector3 angle;
 	Matrix44 worldMat;
 
+	XMFLOAT3 pos;
+	XMFLOAT3 sca;
+	XMFLOAT3 the;
+
+	XMMATRIX mat;
 	void CalcTransFormMatrix() {
 		Matrix44 transMat = Matrix44::CreateTranslation(position);
 		Matrix44 rotateMat = Matrix44::CreateRotationXYZ(angle);
 		Matrix44 scaleMat = Matrix44::CreateScaling(scale);
 
 		worldMat = scaleMat * rotateMat * transMat;
+
+		XMMATRIX ta = XMMatrixTranslation(pos.x, pos.y, pos.z);
+		XMMATRIX ro = XMMatrixRotationRollPitchYaw(the.x, the.y, the.z);
+		XMMATRIX sc = XMMatrixScaling(sca.x, sca.y, sca.z);
+
+		mat = sc * ro * ta;
+
 	}
+
 };
 
 
@@ -177,6 +190,8 @@ int MAIN
 	// ビュー変換行列
 	viewMat = Matrix44::CreateView(eye, target, up);
 
+	Matrix44 ort = Matrix44::CreateOrthoProjection(winApp->GetWindowWidth(), winApp->GetWindowHeight());
+
 	XMMATRIX newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
 	XMMATRIX newview = XMMatrixLookAtLH(xeye, xtarget, xup);
 	Matrix44 aa = viewMat * projectionMat;
@@ -203,6 +218,10 @@ int MAIN
 
 	spriteTrans[1].position = Vector3(100, -50, 20);
 	spriteTrans[1].angle = Vector3(0, XMConvertToRadians(45.0f), XMConvertToRadians(30.0f));
+
+	spriteTrans[0].pos = XMFLOAT3(0, 0, 0);
+	spriteTrans[0].the = XMFLOAT3(0, 0, 0);
+	spriteTrans[0].sca = XMFLOAT3(5, 5, 5);
 
 	ConstBuffer<SpritePipeline::ConstBufferData> spriteConstBuffer[kSpriteCount];
 	for (auto& it : spriteConstBuffer) {
@@ -314,14 +333,16 @@ int MAIN
 			directXCommon->GetCommandList()->DrawInstanced(kLineVertexCount, 1, 0, 0);
 		}
 
-
+		newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
+		newview = XMMatrixLookAtLH(xeye, xtarget, xup);
 	
 		// スプライト描画
 		for (int i = 0; i < kSpriteCount; i++) {
 
 			spriteTrans[i].CalcTransFormMatrix();
-
-			spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].worldMat * viewMat * projectionMat;
+			XMMATRIX xxx = spriteTrans[0].mat * newview * newproj;
+			//spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].worldMat * viewMat * projectionMat;
+			spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].mat * newview * newproj;
 			spriteConstBuffer[i].MapPtr()->color = Vector4{ 1,1,1,1 };
 
 			spritePipeline->SetPipelineState(directXCommon->GetCommandList(), kBlendModeAlpha);

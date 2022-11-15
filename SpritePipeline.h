@@ -1,5 +1,6 @@
 #pragma once
 #include "PipelineBase.h"
+#include <DirectXMath.h>
 
 class SpritePipeline :
 	public PipelineBase 
@@ -16,7 +17,8 @@ public:
 	struct ConstBufferData
 	{
 		Vector4 color;	// F
-		Matrix44 mat;	// •ÏŠ·s—ñ
+		//Matrix44 mat;	// •ÏŠ·s—ñ
+		DirectX::XMMATRIX mat;
 	};
 
 
