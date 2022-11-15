@@ -284,6 +284,7 @@ int MAIN
 			else {
 				n = 0;
 			}
+			target = spriteTrans[n].position;
 		}
 
 
@@ -309,7 +310,6 @@ int MAIN
 		}
 
 
-		target = spriteTrans[n].position;
 
 		// ƒrƒ…[•ÏŠ·s—ñ
 		viewMat = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
