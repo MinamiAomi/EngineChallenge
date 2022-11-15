@@ -44,12 +44,16 @@ public:
 };
 
 // 2DƒxƒNƒgƒ‹
-class Vector2 :
-	public Twins<float> {
+class Vector2 
+{
+public:
+
+	float x;	// x¬•ª
+	float y; // y¬•ª
 
 public:
-	Vector2() : Twins(0.0f, 0.0f) {}
-	Vector2(float x, float y) : Twins(x, y) {}
-	Vector2(const Vector2& v) : Twins(v.x, v.y) {}
+	Vector2() : x(0.0f), y(0.0f) {}
+	Vector2(float x, float y) : x(x), y(y) {}
+	Vector2(const Vector2& v) : x(v.x), y(v.y) {}
 	~Vector2() {}
 };

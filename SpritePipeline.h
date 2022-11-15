@@ -17,8 +17,8 @@ public:
 	struct ConstBufferData
 	{
 		Vector4 color;	// F
-		//Matrix44 mat;	// •ÏŠ·s—ñ
-		DirectX::XMMATRIX mat;
+		Matrix44 mat;	// •ÏŠ·s—ñ
+		//DirectX::XMMATRIX mat;
 	};
 
 

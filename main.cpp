@@ -25,11 +25,11 @@ struct TransForm {
 	Vector3 angle;
 	Matrix44 worldMat;
 
-	XMFLOAT3 pos;
+	/*XMFLOAT3 pos;
 	XMFLOAT3 sca;
 	XMFLOAT3 the;
 
-	XMMATRIX mat;
+	XMMATRIX mat;*/
 	void CalcTransFormMatrix() {
 		Matrix44 transMat = Matrix44::CreateTranslation(position);
 		Matrix44 rotateMat = Matrix44::CreateRotationXYZ(angle);
@@ -37,11 +37,11 @@ struct TransForm {
 
 		worldMat = scaleMat * rotateMat * transMat;
 
-		XMMATRIX ta = XMMatrixTranslation(pos.x, pos.y, pos.z);
+		/*XMMATRIX ta = XMMatrixTranslation(pos.x, pos.y, pos.z);
 		XMMATRIX ro = XMMatrixRotationRollPitchYaw(the.x, the.y, the.z);
 		XMMATRIX sc = XMMatrixScaling(sca.x, sca.y, sca.z);
 
-		mat = sc * ro * ta;
+		mat = sc * ro * ta;*/
 
 	}
 
@@ -74,7 +74,16 @@ int MAIN
 	testImg = textureManager->LoadTexture(L"resources/images/test1.png");
 	aaa = textureManager->LoadTexture(L"resources/images/test.png");
 
-	
+	UINT64 xmf2size = sizeof(XMFLOAT2);
+	UINT64 vec2size = sizeof(Vector2);
+	UINT64 xmf3size = sizeof(XMFLOAT3);
+	UINT64 vec3size = sizeof(Vector3);
+	UINT64 xmf4size = sizeof(XMFLOAT4);
+	UINT64 vec4size = sizeof(Vector4);
+	UINT64 xmmatsize = sizeof(XMMATRIX);
+	UINT64 mat44size = sizeof(Matrix44);
+
+
 
 	/*for (int i = 0; i < _countof(indices) / 3; i++) {
 
@@ -181,9 +190,9 @@ int MAIN
 	Vector3 target(0, 0, 0);	// 注視点座標
 	Vector3 up(0, 1, 0);		// 上方向ベクトル
 
-	XMVECTOR xeye = XMVECTOR{ eye.x,eye.y,eye.z };
+	/*XMVECTOR xeye = XMVECTOR{ eye.x,eye.y,eye.z };
 	XMVECTOR xtarget = XMVECTOR{ target.x,target.y,target.z };
-	XMVECTOR xup = XMVECTOR{ up.x,up.y,up.z };
+	XMVECTOR xup = XMVECTOR{ up.x,up.y,up.z };*/
 
 	// 透視投影行列の計算
 	projectionMat = Matrix44::CreateProjection(fovAngleY, aspectRatio, nearZ, farZ);
@@ -192,10 +201,10 @@ int MAIN
 
 	Matrix44 ort = Matrix44::CreateOrthoProjection(winApp->GetWindowWidth(), winApp->GetWindowHeight());
 
-	XMMATRIX newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
+	/*XMMATRIX newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
 	XMMATRIX newview = XMMatrixLookAtLH(xeye, xtarget, xup);
 	Matrix44 aa = viewMat * projectionMat;
-	XMMATRIX a = newview * newproj;
+	XMMATRIX a = newview * newproj;*/
 
 	// 並行投影行列の計算
 	//projectionMat = XMMatrixOrthographicOffCenterLH(
@@ -219,9 +228,9 @@ int MAIN
 	spriteTrans[1].position = Vector3(100, -50, 20);
 	spriteTrans[1].angle = Vector3(0, XMConvertToRadians(45.0f), XMConvertToRadians(30.0f));
 
-	spriteTrans[0].pos = XMFLOAT3(0, 0, 0);
-	spriteTrans[0].the = XMFLOAT3(0, 0, 0);
-	spriteTrans[0].sca = XMFLOAT3(5, 5, 5);
+	//spriteTrans[0].pos = XMFLOAT3(0, 0, 0);
+	//spriteTrans[0].the = XMFLOAT3(0, 0, 0);
+	//spriteTrans[0].sca = XMFLOAT3(5, 5, 5);
 
 	ConstBuffer<SpritePipeline::ConstBufferData> spriteConstBuffer[kSpriteCount];
 	for (auto& it : spriteConstBuffer) {
@@ -333,16 +342,16 @@ int MAIN
 			directXCommon->GetCommandList()->DrawInstanced(kLineVertexCount, 1, 0, 0);
 		}
 
-		newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
-		newview = XMMatrixLookAtLH(xeye, xtarget, xup);
+		/*newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
+		newview = XMMatrixLookAtLH(xeye, xtarget, xup);*/
 	
 		// スプライト描画
 		for (int i = 0; i < kSpriteCount; i++) {
 
 			spriteTrans[i].CalcTransFormMatrix();
-			XMMATRIX xxx = spriteTrans[0].mat * newview * newproj;
-			//spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].worldMat * viewMat * projectionMat;
-			spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].mat * newview * newproj;
+			//XMMATRIX xxx = spriteTrans[0].mat * newview * newproj;
+			spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].worldMat * viewMat * projectionMat;
+			//spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].mat * newview * newproj;
 			spriteConstBuffer[i].MapPtr()->color = Vector4{ 1,1,1,1 };
 
 			spritePipeline->SetPipelineState(directXCommon->GetCommandList(), kBlendModeAlpha);
