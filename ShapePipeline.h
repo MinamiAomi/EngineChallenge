@@ -15,8 +15,10 @@ public:
 
 	struct ConstBufferData
 	{
-		Matrix44 mat;	// •ÏŠ·s—ñ
+		Matrix44 worldMat;	// •ÏŠ·s—ñ
 	};
+
+	
 
 public:
 	static ShapePipeline* GetInstance();

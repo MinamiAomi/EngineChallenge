@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>	
 
 // 同じ型を２つ保持するクラス（Vector2の親）
 template<class TYPE>

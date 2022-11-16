@@ -1,6 +1,11 @@
-cbuffer ConstBufferDataTransform : register(b0)
+cbuffer CommonConstBufferData : register(b0)
 {
-    matrix mat; // 座標変換行列
+    matrix camera; // カメラ座標変換行列
+}
+
+cbuffer ConstBufferData : register(b1)
+{
+    matrix world; // ワールド座標変換行列
 }
 
 struct VSOutput

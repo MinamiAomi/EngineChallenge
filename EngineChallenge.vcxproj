@@ -145,17 +145,22 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GeometryModel.cpp" />
     <ClCompile Include="include\base\WinApp.cpp" />
     <ClCompile Include="include\directX\DirectXCommon.cpp" />
     <ClCompile Include="include\input\Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="PipelineBase.cpp" />
     <ClCompile Include="ShapePipeline.cpp" />
     <ClCompile Include="SpritePipeline.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buffers.h" />
     <ClInclude Include="ConstBuffer.h" />
+    <ClInclude Include="GeometryModel.h" />
     <ClInclude Include="include\base\WinApp.h" />
     <ClInclude Include="include\directX\d3dx12.h" />
     <ClInclude Include="include\directX\DirectXCommon.h" />
@@ -166,6 +171,7 @@
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="PipelineBase.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="ShapePipeline.h" />
     <ClInclude Include="SpritePipeline.h" />
     <ClInclude Include="TextureManager.h" />

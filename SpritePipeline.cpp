@@ -96,7 +96,8 @@ void SpritePipeline::Create(DirectXCommon* dixcom, D3D12_PRIMITIVE_TOPOLOGY_TYPE
 
 		CD3DX12_ROOT_PARAMETER rootParams[3] = {};
 		rootParams[0].InitAsConstantBufferView(0);
-		rootParams[1].InitAsDescriptorTable(1, &descriptorRange);
+		rootParams[1].InitAsConstantBufferView(1);
+		rootParams[2].InitAsDescriptorTable(1, &descriptorRange);
 
 
 		// テクスチャサンプラーの設定

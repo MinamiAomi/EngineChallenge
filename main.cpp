@@ -7,16 +7,8 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstBuffer.h"
-
 #include "MathUtility.h"
 
-
-#include <DirectXMath.h>
-
-
-#include "Vector3.h"
-
-using namespace DirectX;
 
 
 struct TransForm {
@@ -25,27 +17,71 @@ struct TransForm {
 	Vector3 angle;
 	Matrix44 worldMat;
 
-	/*XMFLOAT3 pos;
-	XMFLOAT3 sca;
-	XMFLOAT3 the;
-
-	XMMATRIX mat;*/
 	void CalcTransFormMatrix() {
 		Matrix44 transMat = Matrix44::CreateTranslation(position);
 		Matrix44 rotateMat = Matrix44::CreateRotationXYZ(angle);
 		Matrix44 scaleMat = Matrix44::CreateScaling(scale);
 
 		worldMat = scaleMat * rotateMat * transMat;
-
-		/*XMMATRIX ta = XMMatrixTranslation(pos.x, pos.y, pos.z);
-		XMMATRIX ro = XMMatrixRotationRollPitchYaw(the.x, the.y, the.z);
-		XMMATRIX sc = XMMatrixScaling(sca.x, sca.y, sca.z);
-
-		mat = sc * ro * ta;*/
-
 	}
 
 };
+
+struct LineMeth
+{
+	struct LineBuffer
+	{
+		VertexBuffer<ShapePipeline::Vertex> vertBuff;
+		ConstBuffer<ShapePipeline::ConstBufferData> worldMatBuff;
+	};
+
+	static constexpr UINT kLineMethMaxNum = 10;
+	static constexpr UINT kVertexNum = 2;
+	static UINT drawLineCount;
+	static LineBuffer lineBuffer[kLineMethMaxNum];
+
+	static void Initalize(ID3D12Device* dev);
+	static void PreDraw() { drawLineCount = 0; }
+	static void Draw(const Vector3& v1, const Vector3& v2, const Vector4& color, ConstBuffer<PipelineBase::CommonConstData> camera);
+	static void Draw(const ShapePipeline::Vertex& vertex1, const ShapePipeline::Vertex& vertex2, const ShapePipeline::ConstBufferData& constdata, ConstBuffer<PipelineBase::CommonConstData> camera);
+};
+UINT LineMeth::drawLineCount = 0;
+LineMeth::LineBuffer LineMeth::lineBuffer[LineMeth::kLineMethMaxNum];
+
+void LineMeth::Initalize(ID3D12Device* dev) {
+	for (auto& it : lineBuffer) {
+		it.vertBuff.Create(dev, kVertexNum);
+		it.worldMatBuff.Create(dev);
+		it.vertBuff.Map();
+		it.worldMatBuff.Map();
+	}
+}
+void LineMeth::Draw(const Vector3& v1, const Vector3& v2, const Vector4& color, ConstBuffer<PipelineBase::CommonConstData> camera) {
+	Draw({ v1,color }, { v2,color }, { Matrix44::Identity }, camera);
+}
+
+void LineMeth::Draw(const ShapePipeline::Vertex& vertex1, const ShapePipeline::Vertex& vertex2, const ShapePipeline::ConstBufferData& constdata, ConstBuffer<PipelineBase::CommonConstData> camera) {
+	assert(drawLineCount < kLineMethMaxNum);
+
+	ID3D12GraphicsCommandList* cmdlist = DirectXCommon::GetInstance()->GetInstance()->GetCommandList();
+
+	ShapePipeline::Vertex vertices[kVertexNum];
+
+	vertices[0] = vertex1;
+	vertices[1] = vertex2;
+	std::copy(std::begin(vertices), std::end(vertices), lineBuffer[drawLineCount].vertBuff.GetMapPtr());
+
+	lineBuffer[drawLineCount].worldMatBuff.MapPtr()->worldMat = constdata.worldMat;
+
+	ShapePipeline::GetInstance()->SetPipelineState(cmdlist, kBlendModeAlpha);
+	cmdlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+	lineBuffer[drawLineCount].vertBuff.IASet(cmdlist);
+	camera.SetGraphicsRootConstantBufferView(cmdlist, 0);
+	lineBuffer[drawLineCount].worldMatBuff.SetGraphicsRootConstantBufferView(cmdlist, 1);
+	cmdlist->DrawInstanced(kVertexNum, 1, 0, 0);
+
+	drawLineCount++;
+}
 
 
 // Windowsアプリのエントリーポイント(main関数)
@@ -74,15 +110,7 @@ int MAIN
 	testImg = textureManager->LoadTexture(L"resources/images/test1.png");
 	aaa = textureManager->LoadTexture(L"resources/images/test.png");
 
-	UINT64 xmf2size = sizeof(XMFLOAT2);
-	UINT64 vec2size = sizeof(Vector2);
-	UINT64 xmf3size = sizeof(XMFLOAT3);
-	UINT64 vec3size = sizeof(Vector3);
-	UINT64 xmf4size = sizeof(XMFLOAT4);
-	UINT64 vec4size = sizeof(Vector4);
-	UINT64 xmmatsize = sizeof(XMMATRIX);
-	UINT64 mat44size = sizeof(Matrix44);
-
+	LineMeth::Initalize(directXCommon->GetDevice());
 
 
 	/*for (int i = 0; i < _countof(indices) / 3; i++) {
@@ -186,31 +214,20 @@ int MAIN
 
 	// ビュー行列
 	Matrix44 viewMat;
-	Vector3 eye(-200 * sinf(0), 100, -200 * cosf(0));	// 視点座標
+	Vector3 eye(0,0,100);	// 視点座標
 	Vector3 target(0, 0, 0);	// 注視点座標
 	Vector3 up(0, 1, 0);		// 上方向ベクトル
-
-	/*XMVECTOR xeye = XMVECTOR{ eye.x,eye.y,eye.z };
-	XMVECTOR xtarget = XMVECTOR{ target.x,target.y,target.z };
-	XMVECTOR xup = XMVECTOR{ up.x,up.y,up.z };*/
 
 	// 透視投影行列の計算
 	projectionMat = Matrix44::CreateProjection(fovAngleY, aspectRatio, nearZ, farZ);
 	// ビュー変換行列
 	viewMat = Matrix44::CreateView(eye, target, up);
 
-	Matrix44 ort = Matrix44::CreateOrthoProjection(winApp->GetWindowWidth(), winApp->GetWindowHeight());
+	Matrix44 ortMat = Matrix44::CreateOrthoProjection((float)winApp->GetWindowWidth(), (float)winApp->GetWindowHeight());
 
-	/*XMMATRIX newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
-	XMMATRIX newview = XMMatrixLookAtLH(xeye, xtarget, xup);
-	Matrix44 aa = viewMat * projectionMat;
-	XMMATRIX a = newview * newproj;*/
-
-	// 並行投影行列の計算
-	//projectionMat = XMMatrixOrthographicOffCenterLH(
-	//	0.0f, (float)winApp->GetWindowWidth(),
-	//	(float)winApp->GetWindowHeight(), 0.0f, 0.0f, 1.0f);
-	//constBuffTransform->Unmap(0, nullptr);
+	ConstBuffer<PipelineBase::CommonConstData> commonConstData;
+	commonConstData.Create(directXCommon->GetDevice());
+	commonConstData.Map();
 
 #pragma endregion
 
@@ -224,13 +241,10 @@ int MAIN
 	TransForm spriteTrans[kSpriteCount];
 	spriteTrans[0].scale = Vector3(5, 5, 5);
 	spriteTrans[1].scale = Vector3(5, 10, 5);
-
+	
+	spriteTrans[0].position = Vector3(100, 200, 200);
 	spriteTrans[1].position = Vector3(100, -50, 20);
-	spriteTrans[1].angle = Vector3(0, XMConvertToRadians(45.0f), XMConvertToRadians(30.0f));
-
-	//spriteTrans[0].pos = XMFLOAT3(0, 0, 0);
-	//spriteTrans[0].the = XMFLOAT3(0, 0, 0);
-	//spriteTrans[0].sca = XMFLOAT3(5, 5, 5);
+	spriteTrans[1].angle = Vector3(0, 0, 0);
 
 	ConstBuffer<SpritePipeline::ConstBufferData> spriteConstBuffer[kSpriteCount];
 	for (auto& it : spriteConstBuffer) {
@@ -244,45 +258,42 @@ int MAIN
 
 #pragma region 軸
 
-	const int kLineVertexCount = 2;
-	const int kLineNum = 3;
-
-	float axisScale = 1000.0f;
-	Vector4 xColor = { 1.0f,0.0f,0.0f,1.0f };
-	Vector4 yColor = { 0.0f,1.0f,0.0f,1.0f };
-	Vector4 zColor = { 0.0f,0.0f,1.0f,1.0f };
-	ShapePipeline::Vertex axis[kLineNum][kLineVertexCount] =
-	{	{ { {axisScale,0.0f,0.0f}, xColor },{ {-axisScale,0.0f,0.0f}, xColor } },
-		{ { {0.0f,axisScale,0.0f}, yColor },{ {0.0f,-axisScale,0.0f}, yColor } },
-		{ { {0.0f,0.0f,axisScale}, zColor },{ {0.0f,0.0f,-axisScale}, zColor } }  };
-
-	ConstBuffer<ShapePipeline::ConstBufferData> axisConstBuffer; // カメラ用
-	axisConstBuffer.Create(directXCommon->GetDevice());
-	axisConstBuffer.Map();
-
-	VertexBuffer<ShapePipeline::Vertex> lineVertBuffer[kLineNum];
-	for (int i = 0; i < kLineNum; i++) {
-		lineVertBuffer[i].Create(directXCommon->GetDevice(), kLineVertexCount);
-		lineVertBuffer[i].Map();
-		std::copy(std::begin(axis[i]), std::end(axis[i]), lineVertBuffer[i].GetMapPtr());
-	}
+	float axisLength = 1000.0f;
+	
 
 #pragma endregion
 	int n = 0;
+
+	float theta1 = 0.0f;
+	float theta2 = 0.0f;
 
 	while (!winApp->WindowQUit()) {
 
 		input->Update();
 		directXCommon->PreDraw();
 
+		LineMeth::PreDraw();
 
 		// AD入力でカメラが原点の周りを回る
-		if (input->IsKeyPressed(DIK_D) || input->IsKeyPressed(DIK_A)) {
-			if (input->IsKeyPressed(DIK_D)) { cameraAngle += XMConvertToRadians(1.0f); }
-			else if (input->IsKeyPressed(DIK_A)) { cameraAngle -= XMConvertToRadians(1.0f); }
+		if (input->IsKeyPressed(DIK_D)) {
+			eye.x += 5;
+		}
+		if (input->IsKeyPressed(DIK_A)) {
+			eye.x += -5;
+		}
 
-			eye.x = -200 * sinf(cameraAngle);
-			eye.z = -200 * cosf(cameraAngle);
+		if (input->IsKeyPressed(DIK_W)) {
+			eye.y += 5;
+		}
+		if (input->IsKeyPressed(DIK_S)) {
+			eye.y += -5;
+		}
+
+		if (input->IsKeyPressed(DIK_E)) {
+			eye.z += 5;
+		}
+		if (input->IsKeyPressed(DIK_Q)) {
+			eye.z += -5;
 		}
 
 		if (input->IsKeyPressed(DIK_W) || input->IsKeyPressed(DIK_S)) {
@@ -321,7 +332,22 @@ int MAIN
 		if (input->IsKeyPressed(DIK_U)) {
 			spriteTrans[n].position.z -= 5;
 		}
+		
 
+		
+
+		if (input->IsKeyPressed(DIK_1)) {
+			spriteTrans[1].angle.x += Math::ToRadians(1.0f);
+		}
+		if (input->IsKeyPressed(DIK_2)) {
+			spriteTrans[1].angle.y += Math::ToRadians(1.0f);
+		}
+		if (input->IsKeyPressed(DIK_3)) {
+			spriteTrans[1].angle.z += Math::ToRadians(1.0f);
+		}
+		if (input->IsKeyTrigger(DIK_T)) {
+			spriteTrans[1].angle *= 0.0f;
+		}
 
 		target = spriteTrans[n].position;
 
@@ -329,38 +355,48 @@ int MAIN
 		projectionMat = Matrix44::CreateProjection(fovAngleY, aspectRatio, nearZ, farZ);
 		// ビュー変換行列
 		viewMat = Matrix44::CreateView(eye, target, up);
+		// カメラバッファに送る
+		commonConstData.MapPtr()->cameraMat = viewMat * projectionMat;
 
+
+
+		
+
+		//Matrix44 lookatmat = Matrix44::CreateLookAt(eye - spriteTrans[1].position, Vector3::UnitY);
+		//Matrix44 lookatmat2 = Matrix44::CreateLookAt( spriteTrans[1].position - spriteTrans[0].position, Vector3::UnitY);
+		//spriteTrans[0].worldMat = Matrix44::CreateScaling(spriteTrans[0].scale) * lookatmat2 * Matrix44::CreateTranslation(spriteTrans[0].position);
+		//spriteTrans[1].worldMat = Matrix44::CreateScaling(spriteTrans[1].scale) * lookatmat * Matrix44::CreateTranslation(spriteTrans[1].position);
 
 		// 軸描画
-		axisConstBuffer.MapPtr()->mat = viewMat * projectionMat;
-		for (int i = 0; i < kLineNum; i++) {
+		LineMeth::Draw(Vector3::UnitX* axisLength, Vector3::UnitX * -axisLength, Color::Red, commonConstData);
+		LineMeth::Draw(Vector3::UnitY* axisLength, Vector3::UnitY * -axisLength, Color::Green, commonConstData);
+		LineMeth::Draw(Vector3::UnitZ* axisLength, Vector3::UnitZ * -axisLength, Color::Blue, commonConstData);
 
-			shapePipeline->SetPipelineState(directXCommon->GetCommandList(), kBlendModeAlpha);
-			directXCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-			lineVertBuffer[i].IASet(directXCommon->GetCommandList());
-			axisConstBuffer.SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 0);
-			directXCommon->GetCommandList()->DrawInstanced(kLineVertexCount, 1, 0, 0);
-		}
+		theta1 += 0.03;
+		Matrix44 rm1 = Matrix44::CreateRotation({ Normalize(eye - spriteTrans[0].position), theta1 });
+		theta2 += 0.05;
+		Matrix44 rm2 = Matrix44::CreateRotation({ Normalize(spriteTrans[0].position - spriteTrans[1].position), theta2 });
+		spriteTrans[0].worldMat = Matrix44::CreateScaling(spriteTrans[0].scale) * rm1 * Matrix44::CreateTranslation(spriteTrans[0].position);
+		spriteTrans[1].worldMat = Matrix44::CreateScaling(spriteTrans[1].scale) * rm2 * Matrix44::CreateTranslation(spriteTrans[1].position);
 
-		/*newproj = XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
-		newview = XMMatrixLookAtLH(xeye, xtarget, xup);*/
+		LineMeth::Draw(Normalize(eye - spriteTrans[0].position) * 1000 + spriteTrans[0].position, spriteTrans[0].position, Color::White, commonConstData);
+		LineMeth::Draw(spriteTrans[0].position, spriteTrans[1].position, Color::White, commonConstData);
 	
 		// スプライト描画
 		for (int i = 0; i < kSpriteCount; i++) {
 
-			spriteTrans[i].CalcTransFormMatrix();
-			//XMMATRIX xxx = spriteTrans[0].mat * newview * newproj;
-			spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].worldMat * viewMat * projectionMat;
-			//spriteConstBuffer[i].MapPtr()->mat = spriteTrans[i].mat * newview * newproj;
+			//spriteTrans[i].CalcTransFormMatrix();
+			spriteConstBuffer[i].MapPtr()->worldMat = spriteTrans[i].worldMat;
 			spriteConstBuffer[i].MapPtr()->color = Vector4{ 1,1,1,1 };
 
 			spritePipeline->SetPipelineState(directXCommon->GetCommandList(), kBlendModeAlpha);
 			directXCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			vertBuffer.IASet(directXCommon->GetCommandList());
 			indexBuff.IASet(directXCommon->GetCommandList());
-			spriteConstBuffer[i].SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 0);
+			commonConstData.SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 0);
+			spriteConstBuffer[i].SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 1);
+			textureManager->SetGraphicsRootDescriptorTable(directXCommon->GetCommandList(), 2, handle[i]);
 
-			textureManager->SetGraphicsRootDescriptorTable(directXCommon->GetCommandList(), 1, handle[i]);
 
 			directXCommon->GetCommandList()->DrawIndexedInstanced(indexBuff.GetIndexCount(), 1, 0, 0, 0);
 		}

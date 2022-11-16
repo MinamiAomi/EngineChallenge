@@ -5,6 +5,9 @@
 class Matrix44
 {
 
+public:
+	static const Matrix44 Identity;
+
 private:
 	float m[4][4];
 
@@ -78,7 +81,7 @@ public:
 	static inline Matrix44 CreateScaling(const Vector3& scale) {
 		return CreateScaling(scale.x, scale.y, scale.z);
 	}
-	
+
 	static inline Matrix44 CreateRotationX(float theta) {
 		float c = cosf(theta);
 		float s = sinf(theta);
@@ -117,6 +120,12 @@ public:
 		return CreateRotationXYZ(theta.x, theta.y, theta.z);
 	}
 
+	//static inline Matrix44 CreateRotationRollPitchYaw((float thetaX, float thetaY, float thetaZ) {
+
+	//}
+
+	static Matrix44 CreateRotation(const class Quaternion&);
+	static Matrix44 CreateRotationFromQuaternion(const class Quaternion&);
 
 	static inline Matrix44 CreateTranslation(float x, float y, float z) {
 		return{ 1.0f,	0.0f,	0.0f,	0.0f,
@@ -128,6 +137,17 @@ public:
 		return CreateTranslation(trans.x, trans.y, trans.z);
 	}
 
+	/// 向かせる行列 （向きベクトルと上ベクトルで作成）
+	static inline Matrix44 CreateLookAt(const Vector3& lookat, const Vector3& up) {
+		Vector3 z = Normalize(lookat);
+		Vector3 x = Normalize(Cross(up, z));
+		Vector3 y = Cross(z, x);
+		return{
+			x.x,	x.y,	x.z,	0.0f,
+			y.x,	y.y,	y.z,	0.0f,
+			z.x,	z.y,	z.z,	0.0f,
+			0.0f,	0.0f,	0.0f,	1.0f };
+	}
 
 
 	static inline Matrix44 CreateView(const Vector3& eye, const Vector3& target, const Vector3& up) {

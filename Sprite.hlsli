@@ -1,7 +1,12 @@
-cbuffer cbuff0 : register(b0)
+cbuffer CommonConstBufferData : register(b0)
 {
-    float4 color;   // 色
-    matrix mat;     // 変換行列
+    matrix camera; // カメラ座標変換行列
+}
+
+cbuffer ConstBufferData : register(b1)
+{
+    float4 color; // 色
+    matrix world; // ワールド座標変換行列
 }
 
 struct VSOutput

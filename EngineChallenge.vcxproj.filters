@@ -16,12 +16,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Math">
-      <UniqueIdentifier>{95fa97da-d6ea-49a2-9bab-3b9320034d48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Math\Vector">
-      <UniqueIdentifier>{8079421d-66df-4d7a-9a0c-4ab0ba0e2a69}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\PipeLine">
       <UniqueIdentifier>{348984b7-d939-41fb-b248-a26025d65078}</UniqueIdentifier>
     </Filter>
@@ -36,6 +30,33 @@
     </Filter>
     <Filter Include="Engine\PipeLine\Shape">
       <UniqueIdentifier>{613d5d20-44fd-46ef-9629-ebec65059bdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Buffer">
+      <UniqueIdentifier>{17ca23eb-9417-404b-ad27-09447b44fa29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math">
+      <UniqueIdentifier>{95fa97da-d6ea-49a2-9bab-3b9320034d48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Vector">
+      <UniqueIdentifier>{8079421d-66df-4d7a-9a0c-4ab0ba0e2a69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\リソース ファイル\Basic">
+      <UniqueIdentifier>{030a1142-8669-4877-bdd6-c4bf7ae0c913}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\リソース ファイル\Sprite">
+      <UniqueIdentifier>{61c51902-bf1d-43de-834d-5d9286591e3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\リソース ファイル\Shape">
+      <UniqueIdentifier>{b01fa88d-30a4-4f4b-ae1b-3e4b4917e697}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GeometryModel">
+      <UniqueIdentifier>{64ee20d4-ac89-452e-826f-3ef3ebe8b3fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Matrix">
+      <UniqueIdentifier>{6e54b020-e53b-43f0-bbde-ebe424417242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Quaternion">
+      <UniqueIdentifier>{24b48daf-c309-4a60-86ad-0c3ef20983ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,16 +82,25 @@
     <ClCompile Include="ShapePipeline.cpp">
       <Filter>Engine\PipeLine\Shape</Filter>
     </ClCompile>
+    <ClCompile Include="GeometryModel.cpp">
+      <Filter>Engine\GeometryModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Engine\Math\Vector</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix.cpp">
+      <Filter>Engine\Math\Matrix</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vector2.h">
-      <Filter>Math\Vector</Filter>
+      <Filter>Engine\Math\Vector</Filter>
     </ClInclude>
     <ClInclude Include="Vector3.h">
-      <Filter>Math\Vector</Filter>
+      <Filter>Engine\Math\Vector</Filter>
     </ClInclude>
     <ClInclude Include="include\math\Vector4.h">
-      <Filter>Math\Vector</Filter>
+      <Filter>Engine\Math\Vector</Filter>
     </ClInclude>
     <ClInclude Include="PipelineBase.h">
       <Filter>Engine\PipeLine\Base</Filter>
@@ -93,57 +123,66 @@
     <ClInclude Include="include\directX\d3dx12.h">
       <Filter>Engine\Base</Filter>
     </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Engine\ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="ShapePipeline.h">
       <Filter>Engine\PipeLine\Shape</Filter>
     </ClInclude>
+    <ClInclude Include="MathUtility.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
     <ClInclude Include="ConstBuffer.h">
-      <Filter>Engine\ヘッダー ファイル</Filter>
+      <Filter>Engine\Buffer</Filter>
     </ClInclude>
     <ClInclude Include="IndexBuffer.h">
-      <Filter>Engine\ヘッダー ファイル</Filter>
+      <Filter>Engine\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Engine\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryModel.h">
+      <Filter>Engine\GeometryModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffers.h">
+      <Filter>Engine\Buffer</Filter>
     </ClInclude>
     <ClInclude Include="Matrix33.h">
-      <Filter>Math\Vector</Filter>
+      <Filter>Engine\Math\Matrix</Filter>
     </ClInclude>
     <ClInclude Include="Matrix44.h">
-      <Filter>Math\Vector</Filter>
+      <Filter>Engine\Math\Matrix</Filter>
     </ClInclude>
-    <ClInclude Include="MathUtility.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="Quaternion.h">
+      <Filter>Engine\Math\Quaternion</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BasicPS.hlsl">
-      <Filter>Engine\リソース ファイル</Filter>
-    </FxCompile>
     <FxCompile Include="BasicVS.hlsl">
-      <Filter>Engine\リソース ファイル</Filter>
+      <Filter>Engine\リソース ファイル\Basic</Filter>
     </FxCompile>
-    <FxCompile Include="ShapeVS.hlsl">
-      <Filter>Engine\リソース ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="ShapePS.hlsl">
-      <Filter>Engine\リソース ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="SpriteVS.hlsl">
-      <Filter>Engine\リソース ファイル</Filter>
+    <FxCompile Include="BasicPS.hlsl">
+      <Filter>Engine\リソース ファイル\Basic</Filter>
     </FxCompile>
     <FxCompile Include="SpritePS.hlsl">
-      <Filter>Engine\リソース ファイル</Filter>
+      <Filter>Engine\リソース ファイル\Sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="SpriteVS.hlsl">
+      <Filter>Engine\リソース ファイル\Sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="ShapePS.hlsl">
+      <Filter>Engine\リソース ファイル\Shape</Filter>
+    </FxCompile>
+    <FxCompile Include="ShapeVS.hlsl">
+      <Filter>Engine\リソース ファイル\Shape</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.hlsli">
-      <Filter>Engine\リソース ファイル</Filter>
-    </None>
-    <None Include="Shape.hlsli">
-      <Filter>Engine\リソース ファイル</Filter>
+      <Filter>Engine\リソース ファイル\Basic</Filter>
     </None>
     <None Include="Sprite.hlsli">
-      <Filter>Engine\リソース ファイル</Filter>
+      <Filter>Engine\リソース ファイル\Sprite</Filter>
+    </None>
+    <None Include="Shape.hlsli">
+      <Filter>Engine\リソース ファイル\Shape</Filter>
     </None>
   </ItemGroup>
 </Project>

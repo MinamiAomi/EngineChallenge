@@ -1,6 +1,10 @@
 #pragma once
+#ifndef VECTOR3_H_
+#define VECTOR3_H_
+
 #include "Vector2.h"
 #include <cassert>
+
 // 同じ型を３つ保持するクラス
 template<class TYPE>
 class Triplet {
@@ -53,6 +57,12 @@ public:
 // 3Dベクトル
 class Vector3
 {
+public:
+	static const Vector3 Zero;
+	static const Vector3 UnitX;	
+	static const Vector3 UnitY;
+	static const Vector3 UnitZ;
+
 public:
 	float x;	// x成分
 	float y; // y成分
@@ -164,8 +174,7 @@ inline float Length(const Vector3& a) {
 
 inline Vector3 Normalize(const Vector3& a) {
 	float len = Length(a);
-	assert(len != 0);
-	return a / len;
+	return len != 0 ? a / len : a;
 }
 
 // 中点
@@ -177,3 +186,7 @@ inline Vector3 Mid(const Vector3& a, const Vector3& b) {
 inline  Vector3 Lerp(float t, const  Vector3& start, const  Vector3& end) {
 	return start + t * (end - start);
 }
+
+
+
+#endif

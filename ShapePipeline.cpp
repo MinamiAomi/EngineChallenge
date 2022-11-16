@@ -95,9 +95,9 @@ void ShapePipeline::Create(DirectXCommon* dixcom, D3D12_PRIMITIVE_TOPOLOGY_TYPE 
 			CD3DX12_DESCRIPTOR_RANGE(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
 
-		CD3DX12_ROOT_PARAMETER rootParams[1] = {};
+		CD3DX12_ROOT_PARAMETER rootParams[2] = {};
 		rootParams[0].InitAsConstantBufferView(0);
-
+		rootParams[1].InitAsConstantBufferView(1);
 
 		// テクスチャサンプラーの設定
 		D3D12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);

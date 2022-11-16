@@ -4,12 +4,12 @@
 
 enum BlendMode
 {
-	kBlendModeNone,			// ブレンドなし
+	//kBlendModeNone,			// ブレンドなし
 	kBlendModeAlpha,		// アルファブレンド
-	kBlendModeAdd,			// 加算合成
-	kBlendModeSubtract,		// 減算合成
-	kBlendModeMultiply,		// 乗算合成
-	kBlendModeInversion,	// 色反転
+	//kBlendModeAdd,			// 加算合成
+	//kBlendModeSubtract,		// 減算合成
+	//kBlendModeMultiply,		// 乗算合成
+	//kBlendModeInversion,	// 色反転
 
 	kBlendModeCount
 };
@@ -21,6 +21,12 @@ class PipelineBase
 protected:
 	template<class TYPE>
 	using ComPtr = Microsoft::WRL::ComPtr<TYPE>;
+
+public:
+	struct CommonConstData
+	{
+		Matrix44 cameraMat;
+	};
 
 
 protected:
