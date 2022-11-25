@@ -38,6 +38,8 @@ public: // ÉÅÉìÉoä÷êî
 	void Initialize(DirectXCommon* dixCom);
 	void ResetAll();
 
+	const D3D12_RESOURCE_DESC& GetRsourceDesc(UINT texHandle);
+
 	void SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* cmdlist, UINT rootParamIndex, UINT texNumber);
 private:
 	TextureManager() = default;

@@ -58,6 +58,12 @@
     <Filter Include="Engine\Math\Quaternion">
       <UniqueIdentifier>{24b48daf-c309-4a60-86ad-0c3ef20983ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Sprite">
+      <UniqueIdentifier>{bbe89e4d-9ea3-4393-bbd6-d787c2deff8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\PipeLine\PipelineManager">
+      <UniqueIdentifier>{4d5c0376-cc93-4f0a-a387-a42f8d9495cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -90,6 +96,15 @@
     </ClCompile>
     <ClCompile Include="Matrix.cpp">
       <Filter>Engine\Math\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Engine\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineManager.cpp">
+      <Filter>Engine\PipeLine\PipelineManager</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineFunc.cpp">
+      <Filter>Engine\PipeLine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +167,15 @@
     </ClInclude>
     <ClInclude Include="Quaternion.h">
       <Filter>Engine\Math\Quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Engine\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineManager.h">
+      <Filter>Engine\PipeLine\PipelineManager</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineFunc.h">
+      <Filter>Engine\PipeLine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

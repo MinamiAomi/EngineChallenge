@@ -49,6 +49,12 @@ void TextureManager::ResetAll()
 	m_nextLoadIndex = 0;
 }
 
+const D3D12_RESOURCE_DESC& TextureManager::GetRsourceDesc(UINT texHandle)
+{
+	assert(m_nextLoadIndex < kDescriptorCount);
+	return m_textures[texHandle].buffer->GetDesc();
+}
+
 UINT TextureManager::LoadTexturePri(const wchar_t* filepath)
 {
 	assert(m_nextLoadIndex < kDescriptorCount);

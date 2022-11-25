@@ -10,7 +10,6 @@ template<class VERTEX_TYPE> class VertexBuffer
 	
 private:
 	UINT m_vertexCount = 0;
-	UINT m_verticesByteSize = 0;
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer;
 	VERTEX_TYPE* m_map = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW m_bufferView = {};
@@ -22,9 +21,9 @@ public:
 	void Create(ID3D12Device* device, UINT vertexCount)
 	{
 		m_vertexCount = vertexCount;
-		m_verticesByteSize = static_cast<UINT>(sizeof(VERTEX_TYPE) * m_vertexCount);
-		CreateBuffer(device);
-		CreateView();
+		UINT byteSize = static_cast<UINT>(sizeof(VERTEX_TYPE) * m_vertexCount);
+		CreateBuffer(device, byteSize);
+		CreateView(byteSize);
 	}
 
 	void Map()
@@ -49,12 +48,12 @@ public:
 
 private:
 
-	void CreateBuffer(ID3D12Device* device) 
+	void CreateBuffer(ID3D12Device* device, UINT verticesByteSize)
 	{
 		HRESULT result = S_FALSE;
 		
 		D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(m_verticesByteSize);
+		D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(verticesByteSize);
 		// バッファの生成
 		result = device->CreateCommittedResource(
 			&heapProp, D3D12_HEAP_FLAG_NONE,
@@ -63,11 +62,11 @@ private:
 		assert(SUCCEEDED(result));
 	}
 
-	void CreateView() 
+	void CreateView(UINT verticesByteSize)
 	{
 		// GPU仮想アドレス
 		m_bufferView.BufferLocation = m_buffer->GetGPUVirtualAddress();
-		m_bufferView.SizeInBytes = m_verticesByteSize;
+		m_bufferView.SizeInBytes = verticesByteSize;
 		m_bufferView.StrideInBytes = sizeof(VERTEX_TYPE);
 	}
 

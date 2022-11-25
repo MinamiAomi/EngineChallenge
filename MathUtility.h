@@ -71,6 +71,13 @@ namespace Math
 	TYPE Min(const TYPE& v1, const TYPE& v2) {
 		return v1 < v2 ? v1 : v2;
 	}
+	// ’l‚ð“ü‚ê‘Ö‚¦‚é
+	template <typename TYPE>
+	void Swap(TYPE& v1, TYPE& v2) {
+		TYPE tmp = v1;
+		v1 = v2;
+		v2 = tmp;
+	}
 	/// <summary>
 	/// ’l‚ðŽû‚ß‚é
 	/// </summary>

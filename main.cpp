@@ -2,14 +2,14 @@
 #include "DirectXCommon.h"
 #include "Input.h"
 #include "TextureManager.h"
-#include "SpritePipeline.h"
-#include "ShapePipeline.h"
+//#include "SpritePipeline.h"
+//#include "ShapePipeline.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstBuffer.h"
 #include "MathUtility.h"
 
-
+#include "Sprite.h"
 
 struct TransForm {
 	Vector3 position;
@@ -27,61 +27,61 @@ struct TransForm {
 
 };
 
-struct LineMeth
-{
-	struct LineBuffer
-	{
-		VertexBuffer<ShapePipeline::Vertex> vertBuff;
-		ConstBuffer<ShapePipeline::ConstBufferData> worldMatBuff;
-	};
-
-	static constexpr UINT kLineMethMaxNum = 10;
-	static constexpr UINT kVertexNum = 2;
-	static UINT drawLineCount;
-	static LineBuffer lineBuffer[kLineMethMaxNum];
-
-	static void Initalize(ID3D12Device* dev);
-	static void PreDraw() { drawLineCount = 0; }
-	static void Draw(const Vector3& v1, const Vector3& v2, const Vector4& color, ConstBuffer<PipelineBase::CommonConstData> camera);
-	static void Draw(const ShapePipeline::Vertex& vertex1, const ShapePipeline::Vertex& vertex2, const ShapePipeline::ConstBufferData& constdata, ConstBuffer<PipelineBase::CommonConstData> camera);
-};
-UINT LineMeth::drawLineCount = 0;
-LineMeth::LineBuffer LineMeth::lineBuffer[LineMeth::kLineMethMaxNum];
-
-void LineMeth::Initalize(ID3D12Device* dev) {
-	for (auto& it : lineBuffer) {
-		it.vertBuff.Create(dev, kVertexNum);
-		it.worldMatBuff.Create(dev);
-		it.vertBuff.Map();
-		it.worldMatBuff.Map();
-	}
-}
-void LineMeth::Draw(const Vector3& v1, const Vector3& v2, const Vector4& color, ConstBuffer<PipelineBase::CommonConstData> camera) {
-	Draw({ v1,color }, { v2,color }, { Matrix44::Identity }, camera);
-}
-
-void LineMeth::Draw(const ShapePipeline::Vertex& vertex1, const ShapePipeline::Vertex& vertex2, const ShapePipeline::ConstBufferData& constdata, ConstBuffer<PipelineBase::CommonConstData> camera) {
-	assert(drawLineCount < kLineMethMaxNum);
-
-	ID3D12GraphicsCommandList* cmdlist = DirectXCommon::GetInstance()->GetInstance()->GetCommandList();
-
-	ShapePipeline::Vertex vertices[kVertexNum];
-
-	vertices[0] = vertex1;
-	vertices[1] = vertex2;
-	std::copy(std::begin(vertices), std::end(vertices), lineBuffer[drawLineCount].vertBuff.GetMapPtr());
-
-	lineBuffer[drawLineCount].worldMatBuff.MapPtr()->worldMat = constdata.worldMat;
-
-	ShapePipeline::GetInstance()->SetPipelineState(cmdlist, kBlendModeAlpha);
-	cmdlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-	lineBuffer[drawLineCount].vertBuff.IASet(cmdlist);
-	camera.SetGraphicsRootConstantBufferView(cmdlist, 0);
-	lineBuffer[drawLineCount].worldMatBuff.SetGraphicsRootConstantBufferView(cmdlist, 1);
-	cmdlist->DrawInstanced(kVertexNum, 1, 0, 0);
-
-	drawLineCount++;
-}
+//struct LineMeth
+//{
+//	struct LineBuffer
+//	{
+//		VertexBuffer<ShapePipeline::Vertex> vertBuff;
+//		ConstBuffer<ShapePipeline::ConstBufferData> worldMatBuff;
+//	};
+//
+//	static constexpr UINT kLineMethMaxNum = 10;
+//	static constexpr UINT kVertexNum = 2;
+//	static UINT drawLineCount;
+//	static LineBuffer lineBuffer[kLineMethMaxNum];
+//
+//	static void Initalize(ID3D12Device* dev);
+//	static void PreDraw() { drawLineCount = 0; }
+//	static void Draw(const Vector3& v1, const Vector3& v2, const Vector4& color, ConstBuffer<PipelineBase::CommonConstData> camera);
+//	static void Draw(const ShapePipeline::Vertex& vertex1, const ShapePipeline::Vertex& vertex2, const ShapePipeline::ConstBufferData& constdata, ConstBuffer<PipelineBase::CommonConstData> camera);
+//};
+//UINT LineMeth::drawLineCount = 0;
+//LineMeth::LineBuffer LineMeth::lineBuffer[LineMeth::kLineMethMaxNum];
+//
+//void LineMeth::Initalize(ID3D12Device* dev) {
+//	for (auto& it : lineBuffer) {
+//		it.vertBuff.Create(dev, kVertexNum);
+//		it.worldMatBuff.Create(dev);
+//		it.vertBuff.Map();
+//		it.worldMatBuff.Map();
+//	}
+//}
+//void LineMeth::Draw(const Vector3& v1, const Vector3& v2, const Vector4& color, ConstBuffer<PipelineBase::CommonConstData> camera) {
+//	Draw({ v1,color }, { v2,color }, { Matrix44::Identity }, camera);
+//}
+//
+//void LineMeth::Draw(const ShapePipeline::Vertex& vertex1, const ShapePipeline::Vertex& vertex2, const ShapePipeline::ConstBufferData& constdata, ConstBuffer<PipelineBase::CommonConstData> camera) {
+//	assert(drawLineCount < kLineMethMaxNum);
+//
+//	ID3D12GraphicsCommandList* cmdlist = DirectXCommon::GetInstance()->GetInstance()->GetCommandList();
+//
+//	ShapePipeline::Vertex vertices[kVertexNum];
+//
+//	vertices[0] = vertex1;
+//	vertices[1] = vertex2;
+//	std::copy(std::begin(vertices), std::end(vertices), lineBuffer[drawLineCount].vertBuff.GetMapPtr());
+//
+//	lineBuffer[drawLineCount].worldMatBuff.MapPtr()->worldMat = constdata.worldMat;
+//
+//	ShapePipeline::GetInstance()->SetPipelineState(cmdlist, kBlendModeAlpha);
+//	cmdlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+//	lineBuffer[drawLineCount].vertBuff.IASet(cmdlist);
+//	camera.SetGraphicsRootConstantBufferView(cmdlist, 0);
+//	lineBuffer[drawLineCount].worldMatBuff.SetGraphicsRootConstantBufferView(cmdlist, 1);
+//	cmdlist->DrawInstanced(kVertexNum, 1, 0, 0);
+//
+//	drawLineCount++;
+//}
 
 
 // Windowsアプリのエントリーポイント(main関数)
@@ -100,17 +100,23 @@ int MAIN
 	TextureManager* textureManager = TextureManager::GetInstance();
 	textureManager->Initialize(directXCommon);
 
-	PipelineBase* spritePipeline = SpritePipeline::GetInstance();
-	spritePipeline->Create(directXCommon,D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-	PipelineBase* shapePipeline = ShapePipeline::GetInstance();
-	shapePipeline->Create(directXCommon,D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+	Sprite::StaticInitalize(
+		directXCommon, textureManager, 
+		winApp->GetWindowWidth(), winApp->GetWindowHeight());
+
+	//PipelineBase* spritePipeline = SpritePipeline::GetInstance();
+	//spritePipeline->Create(directXCommon,D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+	//PipelineBase* shapePipeline = ShapePipeline::GetInstance();
+	//shapePipeline->Create(directXCommon,D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 
 	UINT testImg = 0;
 	UINT aaa;
 	testImg = textureManager->LoadTexture(L"resources/images/test1.png");
 	aaa = textureManager->LoadTexture(L"resources/images/test.png");
 
-	LineMeth::Initalize(directXCommon->GetDevice());
+	Sprite test(testImg, { 0,0 }, { 100,100 });
+
+	//LineMeth::Initalize(directXCommon->GetDevice());
 
 
 	/*for (int i = 0; i < _countof(indices) / 3; i++) {
@@ -136,70 +142,70 @@ int MAIN
 
 #pragma region 立方体モデル
 
-	SpritePipeline::Vertex vertices[] =
-	{	// 前
-		{ {	-5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
-		{ { -5.0f,  5.0f,  -5.0f }, { 0.0f, 0.0f } },	// 左上
-		{ {  5.0f, -5.0f,  -5.0f }, { 1.0f, 1.0f } },	// 右下
-		{ {  5.0f,  5.0f,  -5.0f }, { 1.0f, 0.0f } },	// 右上
-		// 後
-		{ {	-5.0f, -5.0f,   5.0f }, { 0.0f, 1.0f } },	// 左下
-		{ { -5.0f,  5.0f,   5.0f }, { 0.0f, 0.0f } },	// 左上
-		{ {  5.0f, -5.0f,   5.0f }, { 1.0f, 1.0f } },	// 右下
-		{ {  5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
-		// 左
-		{ {	-5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
-		{ { -5.0f, -5.0f,   5.0f }, { 0.0f, 0.0f } },	// 左上
-		{ { -5.0f,  5.0f,  -5.0f }, { 1.0f, 1.0f } },	// 右下
-		{ { -5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
-		// 右
-		{ {	 5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
-		{ {  5.0f, -5.0f,   5.0f }, { 0.0f, 0.0f } },	// 左上
-		{ {  5.0f,  5.0f,  -5.0f }, { 1.0f, 1.0f } },	// 右下
-		{ {  5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
-		// 上
-		{ {	-5.0f,  5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
-		{ {  5.0f,  5.0f,  -5.0f }, { 0.0f, 0.0f } },	// 左上
-		{ { -5.0f,  5.0f,   5.0f }, { 1.0f, 1.0f } },	// 右下
-		{ {  5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
-		// 下
-		{ {	-5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
-		{ {  5.0f, -5.0f,  -5.0f }, { 0.0f, 0.0f } },	// 左上
-		{ { -5.0f, -5.0f,   5.0f }, { 1.0f, 1.0f } },	// 右下
-		{ {  5.0f, -5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
-	};
+	//SpritePipeline::Vertex vertices[] =
+	//{	// 前
+	//	{ {	-5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
+	//	{ { -5.0f,  5.0f,  -5.0f }, { 0.0f, 0.0f } },	// 左上
+	//	{ {  5.0f, -5.0f,  -5.0f }, { 1.0f, 1.0f } },	// 右下
+	//	{ {  5.0f,  5.0f,  -5.0f }, { 1.0f, 0.0f } },	// 右上
+	//	// 後
+	//	{ {	-5.0f, -5.0f,   5.0f }, { 0.0f, 1.0f } },	// 左下
+	//	{ { -5.0f,  5.0f,   5.0f }, { 0.0f, 0.0f } },	// 左上
+	//	{ {  5.0f, -5.0f,   5.0f }, { 1.0f, 1.0f } },	// 右下
+	//	{ {  5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
+	//	// 左
+	//	{ {	-5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
+	//	{ { -5.0f, -5.0f,   5.0f }, { 0.0f, 0.0f } },	// 左上
+	//	{ { -5.0f,  5.0f,  -5.0f }, { 1.0f, 1.0f } },	// 右下
+	//	{ { -5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
+	//	// 右
+	//	{ {	 5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
+	//	{ {  5.0f, -5.0f,   5.0f }, { 0.0f, 0.0f } },	// 左上
+	//	{ {  5.0f,  5.0f,  -5.0f }, { 1.0f, 1.0f } },	// 右下
+	//	{ {  5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
+	//	// 上
+	//	{ {	-5.0f,  5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
+	//	{ {  5.0f,  5.0f,  -5.0f }, { 0.0f, 0.0f } },	// 左上
+	//	{ { -5.0f,  5.0f,   5.0f }, { 1.0f, 1.0f } },	// 右下
+	//	{ {  5.0f,  5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
+	//	// 下
+	//	{ {	-5.0f, -5.0f,  -5.0f }, { 0.0f, 1.0f } },	// 左下
+	//	{ {  5.0f, -5.0f,  -5.0f }, { 0.0f, 0.0f } },	// 左上
+	//	{ { -5.0f, -5.0f,   5.0f }, { 1.0f, 1.0f } },	// 右下
+	//	{ {  5.0f, -5.0f,   5.0f }, { 1.0f, 0.0f } },	// 右上
+	//};
 
-	uint16_t indices[] =
-	{	0, 1, 2,
-		2, 1, 3,
+	//uint16_t indices[] =
+	//{	0, 1, 2,
+	//	2, 1, 3,
 
-		5, 4, 6,
-		5, 6, 7,
+	//	5, 4, 6,
+	//	5, 6, 7,
 
-		8, 9,10,
-	   10, 9,11,
+	//	8, 9,10,
+	//   10, 9,11,
 
-	   13,12,14,
-	   13,14,15,
+	//   13,12,14,
+	//   13,14,15,
 
-	   17,16,18,
-	   17,18,19,
+	//   17,16,18,
+	//   17,18,19,
 
-	   21,22,20,
-	   22,21,23
-	};
+	//   21,22,20,
+	//   22,21,23
+	//};
 
 
-	VertexBuffer<SpritePipeline::Vertex> vertBuffer;
-	vertBuffer.Create(directXCommon->GetDevice(), _countof(vertices));
-	vertBuffer.Map();
-	std::copy(std::begin(vertices), std::end(vertices), vertBuffer.GetMapPtr());
+	//VertexBuffer<SpritePipeline::Vertex> vertBuffer;
+	//vertBuffer.Create(directXCommon->GetDevice(), _countof(vertices));
+	//vertBuffer.Map();
+	//std::copy(std::begin(vertices), std::end(vertices), vertBuffer.GetMapPtr());
 
-	IndexBuffer indexBuff;
-	indexBuff.Create(directXCommon->GetDevice(), _countof(indices));
-	indexBuff.Map();
-	std::copy(std::begin(indices), std::end(indices), indexBuff.GetMapPtr());
-	indexBuff.Unmap();
+	//IndexBuffer indexBuff;
+	//indexBuff.Create(directXCommon->GetDevice(), _countof(indices));
+	//indexBuff.Map();
+	//std::copy(std::begin(indices), std::end(indices), indexBuff.GetMapPtr());
+	//indexBuff.Unmap();
 
 #pragma endregion
 
@@ -214,7 +220,7 @@ int MAIN
 
 	// ビュー行列
 	Matrix44 viewMat;
-	Vector3 eye(0,0,100);	// 視点座標
+	Vector3 eye(0,100,100);	// 視点座標
 	Vector3 target(0, 0, 0);	// 注視点座標
 	Vector3 up(0, 1, 0);		// 上方向ベクトル
 
@@ -225,9 +231,9 @@ int MAIN
 
 	Matrix44 ortMat = Matrix44::CreateOrthoProjection((float)winApp->GetWindowWidth(), (float)winApp->GetWindowHeight());
 
-	ConstBuffer<PipelineBase::CommonConstData> commonConstData;
+	/*ConstBuffer<PipelineBase::CommonConstData> commonConstData;
 	commonConstData.Create(directXCommon->GetDevice());
-	commonConstData.Map();
+	commonConstData.Map();*/
 
 #pragma endregion
 
@@ -243,14 +249,14 @@ int MAIN
 	spriteTrans[1].scale = Vector3(5, 10, 5);
 	
 	spriteTrans[0].position = Vector3(100, 200, 200);
-	spriteTrans[1].position = Vector3(100, -50, 20);
+	spriteTrans[1].position = Vector3(-100, 100, 20);
 	spriteTrans[1].angle = Vector3(0, 0, 0);
 
-	ConstBuffer<SpritePipeline::ConstBufferData> spriteConstBuffer[kSpriteCount];
+	/*ConstBuffer<SpritePipeline::ConstBufferData> spriteConstBuffer[kSpriteCount];
 	for (auto& it : spriteConstBuffer) {
 		it.Create(directXCommon->GetDevice());
 		it.Map();
-	}
+	}*/
 
 	UINT handle[2] = { testImg, aaa };
 
@@ -272,7 +278,7 @@ int MAIN
 		input->Update();
 		directXCommon->PreDraw();
 
-		LineMeth::PreDraw();
+		//LineMeth::PreDraw();
 
 		// AD入力でカメラが原点の周りを回る
 		if (input->IsKeyPressed(DIK_D)) {
@@ -349,17 +355,16 @@ int MAIN
 			spriteTrans[1].angle *= 0.0f;
 		}
 
-		target = spriteTrans[n].position;
 
 		// 透視投影行列の計算
 		projectionMat = Matrix44::CreateProjection(fovAngleY, aspectRatio, nearZ, farZ);
 		// ビュー変換行列
 		viewMat = Matrix44::CreateView(eye, target, up);
 		// カメラバッファに送る
-		commonConstData.MapPtr()->cameraMat = viewMat * projectionMat;
+		//commonConstData.MapPtr()->cameraMat = viewMat * projectionMat;
 
 
-
+		Sprite::Draw(test, kBlendModeAlpha);
 		
 
 		//Matrix44 lookatmat = Matrix44::CreateLookAt(eye - spriteTrans[1].position, Vector3::UnitY);
@@ -367,39 +372,41 @@ int MAIN
 		//spriteTrans[0].worldMat = Matrix44::CreateScaling(spriteTrans[0].scale) * lookatmat2 * Matrix44::CreateTranslation(spriteTrans[0].position);
 		//spriteTrans[1].worldMat = Matrix44::CreateScaling(spriteTrans[1].scale) * lookatmat * Matrix44::CreateTranslation(spriteTrans[1].position);
 
-		// 軸描画
-		LineMeth::Draw(Vector3::UnitX* axisLength, Vector3::UnitX * -axisLength, Color::Red, commonConstData);
-		LineMeth::Draw(Vector3::UnitY* axisLength, Vector3::UnitY * -axisLength, Color::Green, commonConstData);
-		LineMeth::Draw(Vector3::UnitZ* axisLength, Vector3::UnitZ * -axisLength, Color::Blue, commonConstData);
+		//// 軸描画
+		//LineMeth::Draw(Vector3::UnitX* axisLength, Vector3::UnitX * -axisLength, Color::Red, commonConstData);
+		//LineMeth::Draw(Vector3::UnitY* axisLength, Vector3::UnitY * -axisLength, Color::Green, commonConstData);
+		//LineMeth::Draw(Vector3::UnitZ* axisLength, Vector3::UnitZ * -axisLength, Color::Blue, commonConstData);
 
-		theta1 += 0.03;
-		Matrix44 rm1 = Matrix44::CreateRotation({ Normalize(eye - spriteTrans[0].position), theta1 });
-		theta2 += 0.05;
-		Matrix44 rm2 = Matrix44::CreateRotation({ Normalize(spriteTrans[0].position - spriteTrans[1].position), theta2 });
-		spriteTrans[0].worldMat = Matrix44::CreateScaling(spriteTrans[0].scale) * rm1 * Matrix44::CreateTranslation(spriteTrans[0].position);
-		spriteTrans[1].worldMat = Matrix44::CreateScaling(spriteTrans[1].scale) * rm2 * Matrix44::CreateTranslation(spriteTrans[1].position);
+		//theta1 += 0.03f;
+		//Matrix44 rm1 = Matrix44::CreateRotation({ Normalize(eye - spriteTrans[0].position), theta1 });
+		//theta2 += 0.05f;
+		//Matrix44 rm2 = Matrix44::CreateRotation({ Normalize(spriteTrans[0].position - spriteTrans[1].position), theta2 });
+		//spriteTrans[0].worldMat = Matrix44::CreateScaling(spriteTrans[0].scale) * rm1 * Matrix44::CreateTranslation(spriteTrans[0].position);
+		//spriteTrans[1].worldMat = Matrix44::CreateScaling(spriteTrans[1].scale) * rm2 * Matrix44::CreateTranslation(spriteTrans[1].position);
 
-		LineMeth::Draw(Normalize(eye - spriteTrans[0].position) * 1000 + spriteTrans[0].position, spriteTrans[0].position, Color::White, commonConstData);
-		LineMeth::Draw(spriteTrans[0].position, spriteTrans[1].position, Color::White, commonConstData);
+		//LineMeth::Draw(Normalize(eye - spriteTrans[0].position) * 1000 + spriteTrans[0].position, spriteTrans[0].position, Color::White, commonConstData);
+		//LineMeth::Draw(spriteTrans[0].position, spriteTrans[1].position, Color::White, commonConstData);
 	
-		// スプライト描画
-		for (int i = 0; i < kSpriteCount; i++) {
 
-			//spriteTrans[i].CalcTransFormMatrix();
-			spriteConstBuffer[i].MapPtr()->worldMat = spriteTrans[i].worldMat;
-			spriteConstBuffer[i].MapPtr()->color = Vector4{ 1,1,1,1 };
-
-			spritePipeline->SetPipelineState(directXCommon->GetCommandList(), kBlendModeAlpha);
-			directXCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			vertBuffer.IASet(directXCommon->GetCommandList());
-			indexBuff.IASet(directXCommon->GetCommandList());
-			commonConstData.SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 0);
-			spriteConstBuffer[i].SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 1);
-			textureManager->SetGraphicsRootDescriptorTable(directXCommon->GetCommandList(), 2, handle[i]);
-
-
-			directXCommon->GetCommandList()->DrawIndexedInstanced(indexBuff.GetIndexCount(), 1, 0, 0, 0);
-		}
+		//// スプライト描画
+		//for (int i = 0; i < kSpriteCount; i++) {
+		//
+		//	//spriteTrans[i].CalcTransFormMatrix();
+		//	spriteConstBuffer[i].MapPtr()->worldMat = spriteTrans[i].worldMat;
+		//	spriteConstBuffer[i].MapPtr()->color = Vector4{ 1,1,1,1 };
+		//
+		//	spritePipeline->SetPipelineState(directXCommon->GetCommandList(), kBlendModeAlpha);
+		//	directXCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//	vertBuffer.IASet(directXCommon->GetCommandList());
+		//	indexBuff.IASet(directXCommon->GetCommandList());
+		//	commonConstData.SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 0);
+		//	spriteConstBuffer[i].SetGraphicsRootConstantBufferView(directXCommon->GetCommandList(), 1);
+		//	textureManager->SetGraphicsRootDescriptorTable(directXCommon->GetCommandList(), 2, handle[i]);
+		//
+		//
+		//	directXCommon->GetCommandList()->DrawIndexedInstanced(
+		//		indexBuff.GetIndexCount(), 1, 0, 0, 0);
+		//}
 
 
 		

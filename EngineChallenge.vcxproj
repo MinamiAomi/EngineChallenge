@@ -152,7 +152,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="PipelineBase.cpp" />
+    <ClCompile Include="PipelineFunc.cpp" />
+    <ClCompile Include="PipelineManager.cpp" />
     <ClCompile Include="ShapePipeline.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpritePipeline.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Vector.cpp" />
@@ -171,8 +174,11 @@
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="PipelineBase.h" />
+    <ClInclude Include="PipelineFunc.h" />
+    <ClInclude Include="PipelineManager.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="ShapePipeline.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpritePipeline.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Vector2.h" />

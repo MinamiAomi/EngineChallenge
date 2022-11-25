@@ -57,4 +57,30 @@ public:
 	Vector2(float x, float y) : x(x), y(y) {}
 	Vector2(const Vector2& v) : x(v.x), y(v.y) {}
 	~Vector2() {}
+
+	inline void Set(float sx, float sy) { x = sx, y = sy; }
+	inline void Set(const Vector2& p) { x = p.x, y = p.y; }
+
+	inline Vector2 operator+() const { return { x, y }; }
+	inline Vector2 operator-() const { return { -x,-y }; }
+	inline Vector2& operator+=(const Vector2& p) {
+		x += p.x;
+		y += p.y;
+		return *this;
+	}
+	inline Vector2& operator-=(const Vector2& p) {
+		x -= p.x;
+		y -= p.y;
+		return *this;
+	}
+	inline Vector2& operator*=(float s) {
+		x *= s;
+		y *= s;
+		return *this;
+	}
+	inline Vector2& operator/=(float s) {
+		x /= s;
+		y /= s;
+		return *this;
+	}
 };
