@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\2D;$(SolutionDir)include\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\2D;$(SolutionDir)include\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,47 +145,47 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera2D.cpp" />
     <ClCompile Include="GeometryModel.cpp" />
+    <ClCompile Include="include\2D\Camera2D.cpp" />
+    <ClCompile Include="include\2D\Sprite.cpp" />
+    <ClCompile Include="include\base\TextureManager.cpp" />
     <ClCompile Include="include\base\WinApp.cpp" />
     <ClCompile Include="include\directX\DirectXCommon.cpp" />
     <ClCompile Include="include\input\Input.cpp" />
+    <ClCompile Include="include\math\Matrix.cpp" />
+    <ClCompile Include="include\math\Vector.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="PipelineBase.cpp" />
     <ClCompile Include="PipelineFunc.cpp" />
     <ClCompile Include="PipelineManager.cpp" />
     <ClCompile Include="ShapePipeline.cpp" />
-    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpritePipeline.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Buffers.h" />
-    <ClInclude Include="Camera2D.h" />
-    <ClInclude Include="ConstBuffer.h" />
     <ClInclude Include="GeometryModel.h" />
+    <ClInclude Include="include\2D\Camera2D.h" />
+    <ClInclude Include="include\2D\Sprite.h" />
+    <ClInclude Include="include\base\TextureManager.h" />
     <ClInclude Include="include\base\WinApp.h" />
+    <ClInclude Include="include\directX\Buffers.h" />
+    <ClInclude Include="include\directX\ConstBuffer.h" />
     <ClInclude Include="include\directX\d3dx12.h" />
     <ClInclude Include="include\directX\DirectXCommon.h" />
+    <ClInclude Include="include\directX\IndexBuffer.h" />
+    <ClInclude Include="include\directX\VertexBuffer.h" />
     <ClInclude Include="include\input\Input.h" />
+    <ClInclude Include="include\math\MathUtility.h" />
+    <ClInclude Include="include\math\Matrix33.h" />
+    <ClInclude Include="include\math\Matrix44.h" />
+    <ClInclude Include="include\math\Quaternion.h" />
+    <ClInclude Include="include\math\Vector2.h" />
+    <ClInclude Include="include\math\Vector3.h" />
     <ClInclude Include="include\math\Vector4.h" />
-    <ClInclude Include="IndexBuffer.h" />
-    <ClInclude Include="MathUtility.h" />
-    <ClInclude Include="Matrix33.h" />
-    <ClInclude Include="Matrix44.h" />
     <ClInclude Include="PipelineBase.h" />
     <ClInclude Include="PipelineFunc.h" />
     <ClInclude Include="PipelineManager.h" />
-    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="ShapePipeline.h" />
-    <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpritePipeline.h" />
-    <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="Vector2.h" />
-    <ClInclude Include="Vector3.h" />
-    <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
