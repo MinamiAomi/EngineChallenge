@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectXCommon.h"
 #include "MathUtility.h"
+#include <string>
 
 enum BlendMode
 {

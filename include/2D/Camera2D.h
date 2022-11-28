@@ -9,7 +9,6 @@ class Camera2D
 private:
 	
 	// スクリーン座標系
-	bool isScreen = true;
 	unsigned int windowWidth = 1280;
 	unsigned int windowHeight = 720;
 
@@ -18,13 +17,11 @@ private:
 
 public:
 	Camera2D();
-	Camera2D(unsigned int width, unsigned int height, bool isScreen = true);
+	Camera2D(unsigned int width, unsigned int height);
 	virtual ~Camera2D() {}
 
 	virtual void SetUpMatrix();
 	
-	void SetIsScreen() { isScreen; }
-	bool GetIsScreen() { return isScreen; }
 	void SetWindowWidth(unsigned int width) { windowWidth = width; }
 	unsigned int GetWindowWidth() const { return windowWidth; }
 	void SetWindowHeight(unsigned int height) { windowHeight = height; }
@@ -51,7 +48,7 @@ private:
 
 public:
 	Camera2DView();
-	Camera2DView(unsigned int width, unsigned int height, bool isScreen = true);
+	Camera2DView(unsigned int width, unsigned int height);
 
 	void SetUpMatrix();
 

@@ -118,7 +118,7 @@
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources\shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShaderType>Pixel</ShaderType>
     </FxCompile>
   </ItemDefinitionGroup>
@@ -140,7 +140,7 @@
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources\shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShaderType>Pixel</ShaderType>
     </FxCompile>
   </ItemDefinitionGroup>
@@ -158,6 +158,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PipelineBase.cpp" />
     <ClCompile Include="PipelineManager.cpp" />
+    <ClCompile Include="Shape2D.cpp" />
     <ClCompile Include="ShapePipeline.cpp" />
     <ClCompile Include="SpritePipeline.cpp" />
   </ItemGroup>
@@ -184,6 +185,7 @@
     <ClInclude Include="include\PipelineFunc.h" />
     <ClInclude Include="PipelineBase.h" />
     <ClInclude Include="PipelineManager.h" />
+    <ClInclude Include="Shape2D.h" />
     <ClInclude Include="ShapePipeline.h" />
     <ClInclude Include="SpritePipeline.h" />
   </ItemGroup>

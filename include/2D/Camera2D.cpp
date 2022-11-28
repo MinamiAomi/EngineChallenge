@@ -2,22 +2,19 @@
 
 Camera2D::Camera2D() {}
 
-Camera2D::Camera2D(unsigned int width, unsigned int height, bool isScreen) :
-	windowWidth(width), windowHeight(height), isScreen(isScreen) {}
+Camera2D::Camera2D(unsigned int width, unsigned int height) :
+	windowWidth(width), windowHeight(height) {}
 
 void Camera2D::SetUpMatrix() {
 	projectionMat = Matrix44::CreateOrthoProjection(static_cast<float>(windowWidth), static_cast<float>(windowHeight));
-	if (isScreen == false) {
-		//projectionMat = Matrix44::CreateLeftBottomOrigin(static_cast<float>(windowHeight)) * projectionMat;
-	}
 	transformMat = projectionMat;
 }
 
 /////////////////////////
 
 Camera2DView::Camera2DView() {}
-Camera2DView::Camera2DView(unsigned int width, unsigned int height, bool isScreen) :
-	Camera2D(width, height, isScreen) {}
+Camera2DView::Camera2DView(unsigned int width, unsigned int height) :
+	Camera2D(width, height) {}
 
 void Camera2DView::SetUpMatrix() {
 	// 射影行列をセット

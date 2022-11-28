@@ -177,15 +177,9 @@ public:
 		Matrix44 result = CreateTranslation({ -anchorPoint, 0.0f });
 		result *= CreateScaling({ scale, 0.0f });
 		result *= CreateRotationZ(-theta);
-		result *= CreateTranslation({ scroll,0.0f });
+		result *= CreateTranslation({ -scroll,0.0f });
 		result *= CreateTranslation({ anchorPoint, 0.0f });
 		return result;
-	}
-
-	static inline Matrix44 CreateLeftBottomOrigin(float height) {
-		return
-			Matrix44::CreateScaling(1.0f, -1.0f, 0.0f) *
-			Matrix44::CreateTranslation(0.0f, height, 0.0f);
 	}
 
 	static inline Matrix44 CreateOrthoProjection(float width, float height, float nearZ = 0.0f, float farZ = 1.0f) {

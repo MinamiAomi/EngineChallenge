@@ -110,20 +110,24 @@ int MAIN
 	//PipelineBase* shapePipeline = ShapePipeline::GetInstance();
 	//shapePipeline->Create(directXCommon,D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 
-	UINT testImg = 0;
-	UINT aaa;
-	testImg = textureManager->LoadTexture(L"resources/images/test1.png");
-	aaa = textureManager->LoadTexture(L"resources/images/test.png");
+	UINT testImg = textureManager->LoadTexture(L"resources/images/test1.png");
+	UINT aaa = textureManager->LoadTexture(L"resources/images/test.png");
+	UINT hito = textureManager->LoadTexture(L"resources/images/hito.png");
+	UINT dire = textureManager->LoadTexture(L"resources/images/dire.png");
 
 	float theta = 0.0f;
 
-	Sprite test(testImg, { 0,0 }, { 100,100 });
+	Sprite _00(testImg, { 0,0 }, { 64,64 });
+	_00.SetTextureRect({ 0.0f,0.0f }, { 256.0f,256.0f });
+
+	Sprite test(dire, { 0,0 }, { 100,100 });
 	test.SetTextureRect({ 0.0f,0.0f }, { 256.0f,256.0f });
 	//test.SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	test.SetPosition({ 640,360 });
 	test.SetAnchorPoint({ 50.0f,50.0f });
-	
-	Camera2DView camera(winApp->GetWindowWidth(), winApp->GetWindowHeight(), false);
+	test.SetIsFlipY(false);
+
+	Camera2DView camera(winApp->GetWindowWidth(), winApp->GetWindowHeight());
 
 	camera.SetAnchorPoint({ 640.0f, 360.0f});
 	//camera.SetScale({ 1.0f,1.0f });
@@ -243,8 +247,6 @@ int MAIN
 	// ビュー変換行列
 	viewMat = Matrix44::CreateView(eye, target, up);
 
-	Matrix44 ortMat = Matrix44::CreateOrthoProjection((float)winApp->GetWindowWidth(), (float)winApp->GetWindowHeight());
-
 	/*ConstBuffer<PipelineBase::CommonConstData> commonConstData;
 	commonConstData.Create(directXCommon->GetDevice());
 	commonConstData.Map();*/
@@ -295,19 +297,23 @@ int MAIN
 		//LineMeth::PreDraw();
 
 		// AD入力でカメラが原点の周りを回る
+		Vector2 pos = test.GetPosition();
+
 		if (input->IsKeyPressed(DIK_D)) {
-			eye.x += 5;
+			pos.x += 5;
 		}
 		if (input->IsKeyPressed(DIK_A)) {
-			eye.x += -5;
+			pos.x += -5;
 		}
 
 		if (input->IsKeyPressed(DIK_W)) {
-			eye.y += 5;
+			pos.y += 5;
 		}
 		if (input->IsKeyPressed(DIK_S)) {
-			eye.y += -5;
+			pos.y += -5;
 		}
+
+		test.SetPosition(pos);
 
 		if (input->IsKeyPressed(DIK_E)) {
 			eye.z += 5;
@@ -353,7 +359,6 @@ int MAIN
 			spriteTrans[n].position.z -= 5;
 		}
 		
-
 		
 
 		if (input->IsKeyPressed(DIK_1)) {
@@ -372,17 +377,23 @@ int MAIN
 		auto theta = camera.GetRotation();
 		theta += Math::ToRadians(1.0f);
 		
-		auto pos = camera.GetScroll();
-
-		if (input->IsKeyPressed(DIK_D)) {
-			pos.x += 5;
-		}
-		if (input->IsKeyPressed(DIK_A)) {
-			pos.x += -5;
-		}
+		auto camerapos = camera.GetScroll();
 		
-		camera.SetRoatation(theta);
-		camera.SetScroll(pos);
+		if (input->IsKeyPressed(DIK_E)) {
+			camerapos.x += 5;
+		}
+		if (input->IsKeyPressed(DIK_Q)) {
+			camerapos.x += -5;
+		}
+		if (input->IsKeyPressed(DIK_R)) {
+			camerapos.y += 5;
+		}
+		if (input->IsKeyPressed(DIK_F)) {
+			camerapos.y += -5;
+		}
+
+		//camera.SetRoatation(theta);
+		camera.SetScroll(camerapos);
 
 		//camera.SetRoatation(theta);
 		///
@@ -401,6 +412,7 @@ int MAIN
 		//theta += Math::ToRadians(1.0f);
 		//test.SetRotation(theta);
 		Sprite::Draw(test, &camera, kBlendModeNormal);
+		Sprite::Draw(_00, &camera, kBlendModeNormal);
 		
 
 		//Matrix44 lookatmat = Matrix44::CreateLookAt(eye - spriteTrans[1].position, Vector3::UnitY);

@@ -136,7 +136,7 @@ void Sprite::StaticInitalize(DirectXCommon* dixCom, TextureManager* texMan, UINT
 		pipelineDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 		// ラスタライザの設定
 		pipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-		pipelineDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK; // カリングしない
+		pipelineDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // カリングしない
 		//pipelineDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME; // ワイヤーフレーム
 
 		// ブレンドステート
@@ -175,6 +175,7 @@ Sprite* Sprite::Create(uint32_t textureHandle, Vector2 position, Vector2 size, V
 
 void Sprite::Draw(Sprite& sprite, const Camera2D* camera, BlendMode blend)
 {
+
 	auto* cmdList = diXCom->GetCommandList();
 	// パイプラインをセット
 	cmdList->SetPipelineState(pipelineState[blend].Get());
@@ -216,7 +217,7 @@ void Sprite::SetTextureRect(const Vector2& texBase, const Vector2& texSize)
 	this->texSize = texSize;
 }
 
-void Sprite::TransferVertex(ID3D12GraphicsCommandList* cmdList, TextureManager* texMana) 
+void Sprite::TransferVertex(ID3D12GraphicsCommandList* cmdList, TextureManager* texMana)
 {
 	
 	auto resDesc = texManager->GetRsourceDesc(textureHandle);
@@ -237,6 +238,7 @@ void Sprite::TransferVertex(ID3D12GraphicsCommandList* cmdList, TextureManager* 
 	if (isFlipY == true) {
 		Math::Swap(uvTop, uvBottom);
 	}
+	
 
 	std::vector<Vertex> vertices;
 
