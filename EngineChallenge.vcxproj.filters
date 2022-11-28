@@ -64,6 +64,9 @@
     <Filter Include="Engine\PipeLine\PipelineManager">
       <UniqueIdentifier>{4d5c0376-cc93-4f0a-a387-a42f8d9495cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Camera">
+      <UniqueIdentifier>{5a32b33b-2e8b-48f5-a56b-72991f12070b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -105,6 +108,9 @@
     </ClCompile>
     <ClCompile Include="PipelineFunc.cpp">
       <Filter>Engine\PipeLine</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera2D.cpp">
+      <Filter>Engine\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="PipelineFunc.h">
       <Filter>Engine\PipeLine</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera2D.h">
+      <Filter>Engine\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

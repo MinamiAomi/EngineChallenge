@@ -3,7 +3,7 @@
 VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)
 {
     VSOutput output;
-    output.svpos = mul(mul(camera, world), pos);
+    output.svpos = mul(transMat, pos);
     output.uv = uv;
     return output;
 }

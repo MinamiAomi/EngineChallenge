@@ -5,6 +5,7 @@
 #include "DirectXCommon.h"
 #include "TextureManager.h"
 #include <vector>
+#include "Camera2D.h"
 
 #pragma comment(lib,"d3dcompiler.lib")
 
@@ -15,8 +16,6 @@ Sprite::ComPtr<ID3D12RootSignature> Sprite::rootSignature; // ルートシグネチャ
 Sprite::ComPtr<ID3D12PipelineState> Sprite::pipelineState[kBlendModeCount]; // パイプラインステート
 
 IndexBuffer Sprite::indexBuffer; // インデックス
-Sprite::CommonConstData Sprite::commonConstData; // カメラ行列
-ConstBuffer< Sprite::CommonConstData> Sprite::commonConstBuffer; // 共通定数バッファ
 
 void Sprite::StaticInitalize(DirectXCommon* dixCom, TextureManager* texMan, UINT winWidth, UINT winHeight)
 {
@@ -24,10 +23,6 @@ void Sprite::StaticInitalize(DirectXCommon* dixCom, TextureManager* texMan, UINT
 	assert(texMan != nullptr);
 	diXCom = dixCom;
 	texManager = texMan;
-	commonConstData.cameraMat = Matrix44::CreateOrthoProjection(static_cast<float>(winWidth), static_cast<float>(winHeight));
-	commonConstBuffer.Create(dixCom->GetDevice());
-	commonConstBuffer.Map();
-	commonConstBuffer.MapPtr()->cameraMat = commonConstData.cameraMat;
 
 	std::vector<uint16_t> indices = 
 	{	0, 1, 2,
@@ -93,10 +88,9 @@ void Sprite::StaticInitalize(DirectXCommon* dixCom, TextureManager* texMan, UINT
 		CD3DX12_DESCRIPTOR_RANGE(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
 	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootParams[3] = {};
+	CD3DX12_ROOT_PARAMETER rootParams[2] = {};
 	rootParams[0].InitAsConstantBufferView(0);
-	rootParams[1].InitAsConstantBufferView(1);
-	rootParams[2].InitAsDescriptorTable(1, &descriptorRange);
+	rootParams[1].InitAsDescriptorTable(1, &descriptorRange);
 
 	// テクスチャサンプラーの設定
 	D3D12_STATIC_SAMPLER_DESC samplerDesc = {};
@@ -179,7 +173,7 @@ Sprite* Sprite::Create(uint32_t textureHandle, Vector2 position, Vector2 size, V
 	return new Sprite(textureHandle, position, size, color, anchorPoint, isFlipX, isFlipY);
 }
 
-void Sprite::Draw(Sprite& sprite, BlendMode blend)
+void Sprite::Draw(Sprite& sprite, const Camera2D* camera, BlendMode blend)
 {
 	auto* cmdList = diXCom->GetCommandList();
 	// パイプラインをセット
@@ -188,15 +182,13 @@ void Sprite::Draw(Sprite& sprite, BlendMode blend)
 	// 三角形リストにセット
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 頂点データを転送
-	sprite.TransferVertex(cmdList, texManager->GetRsourceDesc(sprite.GetTextureHandle()));
+	sprite.TransferVertex(cmdList, texManager);
 	// インデックスバッファをセット
 	indexBuffer.IASet(cmdList);
-	// 共通定数をセット
-	commonConstBuffer.SetGraphicsRootConstantBufferView(cmdList, 0);
-	// 個別定数を転送
-	sprite.TransferConstData(cmdList);
+	// 定数を転送
+	sprite.TransferConstData(cmdList, camera);
 	// 画像をセット
-	texManager->SetGraphicsRootDescriptorTable(cmdList, 2, sprite.GetTextureHandle());
+	texManager->SetGraphicsRootDescriptorTable(cmdList, 1, sprite.GetTextureHandle());
 	// 描画
 	cmdList->DrawIndexedInstanced(kIndexCount, 1, 0, 0, 0);
 }
@@ -224,11 +216,15 @@ void Sprite::SetTextureRect(const Vector2& texBase, const Vector2& texSize)
 	this->texSize = texSize;
 }
 
-void Sprite::TransferVertex(ID3D12GraphicsCommandList* cmdList, const D3D12_RESOURCE_DESC& resDesc) {
+void Sprite::TransferVertex(ID3D12GraphicsCommandList* cmdList, TextureManager* texMana) 
+{
+	
+	auto resDesc = texManager->GetRsourceDesc(textureHandle);
+
 	float posLeft = -anchorPoint.x;
 	float posRight = posLeft + size.x;
 	float posTop = -anchorPoint.y;
-	float posBottom = posTop - size.y;
+	float posBottom = posTop + size.y;
 
 	float uvLeft = texBase.x / static_cast<float>(resDesc.Width);
 	float uvRight = texBase.x + texSize.x / static_cast<float>(resDesc.Width);
@@ -256,9 +252,9 @@ void Sprite::TransferVertex(ID3D12GraphicsCommandList* cmdList, const D3D12_RESO
 	vertexBuffer.IASet(cmdList);
 }
 
-void Sprite::TransferConstData(ID3D12GraphicsCommandList* cmdList) {
+void Sprite::TransferConstData(ID3D12GraphicsCommandList* cmdList, const Camera2D* camera) {
 	worldMat = Matrix44::CreateRotationZ(rotation) * Matrix44::CreateTranslation({ position, 0.0f });
-	constBuffer.MapPtr()->worldMat = worldMat;
+	constBuffer.MapPtr()->matrix = worldMat * camera->GetTransformMatrix();
 	constBuffer.MapPtr()->color = color;
-	constBuffer.SetGraphicsRootConstantBufferView(cmdList, 1);
+	constBuffer.SetGraphicsRootConstantBufferView(cmdList, 0);
 }

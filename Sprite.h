@@ -24,12 +24,7 @@ public:
 	struct ConstBufferData
 	{
 		Vector4 color;	// 色
-		Matrix44 worldMat;	// 変換行列
-	};
-	// 共通定数
-	struct CommonConstData
-	{
-		Matrix44 cameraMat;
+		Matrix44 matrix;	// 変換行列
 	};
 private:
 	static const int kVertexCount = 4; // 頂点数
@@ -41,8 +36,6 @@ private:
 	static ComPtr<ID3D12PipelineState> pipelineState[kBlendModeCount]; // パイプラインステート
 	
 	static IndexBuffer indexBuffer; // インデックス
-	static CommonConstData commonConstData; // カメラ行列
-	static ConstBuffer<CommonConstData> commonConstBuffer; // 共通定数バッファ
 
 public: // 静的メンバ関数
 	// 静的メンバの初期化
@@ -52,7 +45,7 @@ public: // 静的メンバ関数
 		UINT  textureHandle, Vector2 position, Vector2 size = { 0,0 }, Vector4 color = { 1,1,1,1 },
 		Vector2 anchorPoint = { 0,0 }, bool isFlipX = false, bool isFlipY = false);
 
-	static void Draw(Sprite& sprite, BlendMode blend);
+	static void Draw(Sprite& sprite, const class Camera2D* camera, BlendMode blend);
 
 private:
 	VertexBuffer<Vertex> vertexBuffer; // 頂点バッファ
@@ -60,7 +53,7 @@ private:
 	UINT  textureHandle = 0; // テクスチャハンドル
 	float rotation = 0.0f; // Z軸回りの回転角（2D回転）
 	Vector2 position = { 0.0f,0.0f }; // 座標
-	Vector2 size = { 100.0f,0.0f }; // サイズ
+	Vector2 size = { 100.0f,100.0f }; // サイズ
 	Vector2 anchorPoint = { 0.0f,0.0f }; // 回転移動を行う基準点
 	Matrix44 worldMat; // ワールド行列
 	Vector4 color = { 1.0f,1.0f,1.0f,1.0f }; // 色
@@ -94,7 +87,7 @@ public:
 	void SetTextureRect(const Vector2& texBase, const Vector2& texSize);
 
 private:
-	void TransferVertex(ID3D12GraphicsCommandList* cmdList, const D3D12_RESOURCE_DESC& resDesc);
-	void TransferConstData(ID3D12GraphicsCommandList* cmdList);
+	void TransferVertex(ID3D12GraphicsCommandList* cmdList, TextureManager* texMana);
+	void TransferConstData(ID3D12GraphicsCommandList* cmdList, const class Camera2D* camera);
 };
 

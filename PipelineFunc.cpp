@@ -16,7 +16,7 @@ void SetBlendState(D3D12_RENDER_TARGET_BLEND_DESC& blendDesc, BlendMode blendmod
 		//	blendDesc.BlendEnable = false;						// ブレンドしない
 		//	return;
 		//default:
-	case kBlendModeAlpha:
+	case kBlendModeNormal:
 		blendDesc.BlendEnable = true;						// ブレンドを有効にする
 		blendDesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
 		blendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			// ソースのアルファ値

@@ -9,6 +9,7 @@
 #include "ConstBuffer.h"
 #include "MathUtility.h"
 
+#include "Camera2D.h"
 #include "Sprite.h"
 
 struct TransForm {
@@ -114,7 +115,20 @@ int MAIN
 	testImg = textureManager->LoadTexture(L"resources/images/test1.png");
 	aaa = textureManager->LoadTexture(L"resources/images/test.png");
 
+	float theta = 0.0f;
+
 	Sprite test(testImg, { 0,0 }, { 100,100 });
+	test.SetTextureRect({ 0.0f,0.0f }, { 256.0f,256.0f });
+	//test.SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	test.SetPosition({ 640,360 });
+	test.SetAnchorPoint({ 50.0f,50.0f });
+	
+	Camera2DView camera(winApp->GetWindowWidth(), winApp->GetWindowHeight(), false);
+
+	camera.SetAnchorPoint({ 640.0f, 360.0f});
+	//camera.SetScale({ 1.0f,1.0f });
+	////camera.SetRoatation(Math::ToRadians(5.0f));
+    //camera.SetScroll({ 0.0f,0.0f });
 
 	//LineMeth::Initalize(directXCommon->GetDevice());
 
@@ -277,7 +291,7 @@ int MAIN
 
 		input->Update();
 		directXCommon->PreDraw();
-
+	
 		//LineMeth::PreDraw();
 
 		// AD入力でカメラが原点の周りを回る
@@ -355,6 +369,28 @@ int MAIN
 			spriteTrans[1].angle *= 0.0f;
 		}
 
+		auto theta = camera.GetRotation();
+		theta += Math::ToRadians(1.0f);
+		
+		auto pos = camera.GetScroll();
+
+		if (input->IsKeyPressed(DIK_D)) {
+			pos.x += 5;
+		}
+		if (input->IsKeyPressed(DIK_A)) {
+			pos.x += -5;
+		}
+		
+		camera.SetRoatation(theta);
+		camera.SetScroll(pos);
+
+		//camera.SetRoatation(theta);
+		///
+		/// 描画処理はここから
+		///
+
+		camera.SetUpMatrix();
+
 
 		// 透視投影行列の計算
 		projectionMat = Matrix44::CreateProjection(fovAngleY, aspectRatio, nearZ, farZ);
@@ -362,9 +398,9 @@ int MAIN
 		viewMat = Matrix44::CreateView(eye, target, up);
 		// カメラバッファに送る
 		//commonConstData.MapPtr()->cameraMat = viewMat * projectionMat;
-
-
-		Sprite::Draw(test, kBlendModeAlpha);
+		//theta += Math::ToRadians(1.0f);
+		//test.SetRotation(theta);
+		Sprite::Draw(test, &camera, kBlendModeNormal);
 		
 
 		//Matrix44 lookatmat = Matrix44::CreateLookAt(eye - spriteTrans[1].position, Vector3::UnitY);

@@ -14,8 +14,8 @@ private: // エイリアス
 	struct Texture
 	{
 		ComPtr<ID3D12Resource> buffer; // バッファ
-		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle; // CPUハンドル
-		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle; // GPUハンドル
+		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = {}; // CPUハンドル
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = {}; // GPUハンドル
 
 	};
 
@@ -23,10 +23,10 @@ private: // 定数
 	static constexpr size_t kDescriptorCount = 50;
 
 private: // メンバ変数
-	DirectXCommon* m_directXCommon;
+	DirectXCommon* m_directXCommon = nullptr;
 
 	ComPtr<ID3D12DescriptorHeap> m_srvHeap;
-	UINT m_descriptorIncrementSize;
+	UINT m_descriptorIncrementSize = 0;
 	std::array<Texture, kDescriptorCount> m_textures;
 
 	UINT m_nextLoadIndex = 0;
@@ -38,7 +38,7 @@ public: // メンバ関数
 	void Initialize(DirectXCommon* dixCom);
 	void ResetAll();
 
-	const D3D12_RESOURCE_DESC& GetRsourceDesc(UINT texHandle);
+	D3D12_RESOURCE_DESC GetRsourceDesc(UINT texHandle);
 
 	void SetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList* cmdlist, UINT rootParamIndex, UINT texNumber);
 private:

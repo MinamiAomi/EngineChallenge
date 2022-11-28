@@ -145,6 +145,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera2D.cpp" />
     <ClCompile Include="GeometryModel.cpp" />
     <ClCompile Include="include\base\WinApp.cpp" />
     <ClCompile Include="include\directX\DirectXCommon.cpp" />
@@ -162,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffers.h" />
+    <ClInclude Include="Camera2D.h" />
     <ClInclude Include="ConstBuffer.h" />
     <ClInclude Include="GeometryModel.h" />
     <ClInclude Include="include\base\WinApp.h" />

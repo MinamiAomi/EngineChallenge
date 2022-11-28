@@ -83,4 +83,20 @@ public:
 		y /= s;
 		return *this;
 	}
+
+	friend inline Vector2 operator+(const Vector2& a, const Vector2& b) {
+		return { a.x + b.x, a.y + b.y };
+	}
+	friend inline Vector2 operator-(const Vector2& a, const Vector2& b) {
+		return { a.x - b.x, a.y - b.y };
+	}
+	friend inline Vector2 operator*(const Vector2& a, float s) {
+		return { a.x * s, a.y * s };
+	}
+	friend inline Vector2 operator*(float s, const Vector2& a) {
+		return { s * a.x, s * a.y };
+	}
+	friend inline Vector2 operator/(const Vector2& a, float s) {
+		return { a.x / s, a.y / s };
+	}
 };

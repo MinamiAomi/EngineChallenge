@@ -5,7 +5,7 @@
 enum BlendMode
 {
 	//kBlendModeNone,			// ブレンドなし
-	kBlendModeAlpha,		// アルファブレンド
+	kBlendModeNormal,		// 通常
 	//kBlendModeAdd,			// 加算合成
 	//kBlendModeSubtract,		// 減算合成
 	//kBlendModeMultiply,		// 乗算合成
