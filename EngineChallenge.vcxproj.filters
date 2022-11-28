@@ -97,23 +97,23 @@
     <ClCompile Include="PipelineManager.cpp">
       <Filter>Engine\PipeLine\PipelineManager</Filter>
     </ClCompile>
-    <ClCompile Include="PipelineFunc.cpp">
-      <Filter>Engine\PipeLine</Filter>
-    </ClCompile>
     <ClCompile Include="include\math\Vector.cpp">
       <Filter>Engine\Math\Vector</Filter>
     </ClCompile>
     <ClCompile Include="include\math\Matrix.cpp">
       <Filter>Engine\Math\Matrix</Filter>
     </ClCompile>
-    <ClCompile Include="include\2D\Sprite.cpp">
-      <Filter>Engine\2D\Sprite</Filter>
-    </ClCompile>
     <ClCompile Include="include\2D\Camera2D.cpp">
       <Filter>Engine\2D\Camera</Filter>
     </ClCompile>
     <ClCompile Include="include\base\TextureManager.cpp">
       <Filter>Engine\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="include\2D\Sprite.cpp">
+      <Filter>Engine\2D\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="include\PipelineFunc.cpp">
+      <Filter>Engine\PipeLine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -147,9 +147,6 @@
     <ClInclude Include="PipelineManager.h">
       <Filter>Engine\PipeLine\PipelineManager</Filter>
     </ClInclude>
-    <ClInclude Include="PipelineFunc.h">
-      <Filter>Engine\PipeLine</Filter>
-    </ClInclude>
     <ClInclude Include="include\math\Vector2.h">
       <Filter>Engine\Math\Vector</Filter>
     </ClInclude>
@@ -168,9 +165,6 @@
     <ClInclude Include="include\math\Quaternion.h">
       <Filter>Engine\Math\Quaternion</Filter>
     </ClInclude>
-    <ClInclude Include="include\2D\Sprite.h">
-      <Filter>Engine\2D\Sprite</Filter>
-    </ClInclude>
     <ClInclude Include="include\2D\Camera2D.h">
       <Filter>Engine\2D\Camera</Filter>
     </ClInclude>
@@ -188,6 +182,12 @@
     </ClInclude>
     <ClInclude Include="include\directX\VertexBuffer.h">
       <Filter>Engine\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\2D\Sprite.h">
+      <Filter>Engine\2D\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PipelineFunc.h">
+      <Filter>Engine\PipeLine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

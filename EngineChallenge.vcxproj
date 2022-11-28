@@ -154,9 +154,9 @@
     <ClCompile Include="include\input\Input.cpp" />
     <ClCompile Include="include\math\Matrix.cpp" />
     <ClCompile Include="include\math\Vector.cpp" />
+    <ClCompile Include="include\PipelineFunc.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PipelineBase.cpp" />
-    <ClCompile Include="PipelineFunc.cpp" />
     <ClCompile Include="PipelineManager.cpp" />
     <ClCompile Include="ShapePipeline.cpp" />
     <ClCompile Include="SpritePipeline.cpp" />
@@ -181,8 +181,8 @@
     <ClInclude Include="include\math\Vector2.h" />
     <ClInclude Include="include\math\Vector3.h" />
     <ClInclude Include="include\math\Vector4.h" />
+    <ClInclude Include="include\PipelineFunc.h" />
     <ClInclude Include="PipelineBase.h" />
-    <ClInclude Include="PipelineFunc.h" />
     <ClInclude Include="PipelineManager.h" />
     <ClInclude Include="ShapePipeline.h" />
     <ClInclude Include="SpritePipeline.h" />
