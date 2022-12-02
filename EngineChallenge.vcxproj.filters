@@ -73,6 +73,24 @@
     <Filter Include="Engine\2D\Shape">
       <UniqueIdentifier>{63410806-8971-4ba4-9ec2-9cb2feec77ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\2D\Library">
+      <UniqueIdentifier>{cd221ed3-0337-4808-ba38-e0dd1de15518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Base\DirectXCommon">
+      <UniqueIdentifier>{b8672060-4e3b-4720-a5cd-abd471136ee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Base\TextureManager">
+      <UniqueIdentifier>{cad6b6b7-8080-4774-9e61-6bfc0ea12d34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Base\WinApp">
+      <UniqueIdentifier>{148395e2-424c-4dfd-8f84-1178e0fdb2a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Base\Input">
+      <UniqueIdentifier>{4b53f6d5-0b8c-4330-af43-65853a9e87a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Base\System">
+      <UniqueIdentifier>{0858b2e0-8cbb-4beb-bf12-074a72d5cfcc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -81,15 +99,6 @@
     </ClCompile>
     <ClCompile Include="SpritePipeline.cpp">
       <Filter>Engine\PipeLine\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="include\directX\DirectXCommon.cpp">
-      <Filter>Engine\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="include\input\Input.cpp">
-      <Filter>Engine\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="include\base\WinApp.cpp">
-      <Filter>Engine\Base</Filter>
     </ClCompile>
     <ClCompile Include="ShapePipeline.cpp">
       <Filter>Engine\PipeLine\Shape</Filter>
@@ -109,9 +118,6 @@
     <ClCompile Include="include\2D\Camera2D.cpp">
       <Filter>Engine\2D\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="include\base\TextureManager.cpp">
-      <Filter>Engine\Base</Filter>
-    </ClCompile>
     <ClCompile Include="include\2D\Sprite.cpp">
       <Filter>Engine\2D\Sprite</Filter>
     </ClCompile>
@@ -120,6 +126,24 @@
     </ClCompile>
     <ClCompile Include="Shape2D.cpp">
       <Filter>Engine\2D\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="Library2D.cpp">
+      <Filter>Engine\2D\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="include\directX\DirectXCommon.cpp">
+      <Filter>Engine\Base\DirectXCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="include\base\TextureManager.cpp">
+      <Filter>Engine\Base\TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="include\base\WinApp.cpp">
+      <Filter>Engine\Base\WinApp</Filter>
+    </ClCompile>
+    <ClCompile Include="include\input\Input.cpp">
+      <Filter>Engine\Base\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseSystem.cpp">
+      <Filter>Engine\Base\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,15 +155,6 @@
     </ClInclude>
     <ClInclude Include="SpritePipeline.h">
       <Filter>Engine\PipeLine\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="include\directX\DirectXCommon.h">
-      <Filter>Engine\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="include\base\WinApp.h">
-      <Filter>Engine\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="include\input\Input.h">
-      <Filter>Engine\Base</Filter>
     </ClInclude>
     <ClInclude Include="include\directX\d3dx12.h">
       <Filter>Engine\Base</Filter>
@@ -174,9 +189,6 @@
     <ClInclude Include="include\2D\Camera2D.h">
       <Filter>Engine\2D\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="include\base\TextureManager.h">
-      <Filter>Engine\Base</Filter>
-    </ClInclude>
     <ClInclude Include="include\directX\Buffers.h">
       <Filter>Engine\Buffer</Filter>
     </ClInclude>
@@ -197,6 +209,24 @@
     </ClInclude>
     <ClInclude Include="Shape2D.h">
       <Filter>Engine\2D\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="Library2D.h">
+      <Filter>Engine\2D\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="include\directX\DirectXCommon.h">
+      <Filter>Engine\Base\DirectXCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\TextureManager.h">
+      <Filter>Engine\Base\TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\WinApp.h">
+      <Filter>Engine\Base\WinApp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\input\Input.h">
+      <Filter>Engine\Base\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseSystem.h">
+      <Filter>Engine\Base\System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,4 @@
-#include "WinApp.h"
-#include "DirectXCommon.h"
-#include "Input.h"
-#include "TextureManager.h"
+#include "BaseSystem.h"
 //#include "SpritePipeline.h"
 //#include "ShapePipeline.h"
 #include "VertexBuffer.h"
@@ -88,18 +85,11 @@ struct TransForm {
 // Windowsアプリのエントリーポイント(main関数)
 int MAIN
 {
+	const int windowWidth = 1280;
+	const int windowHeight = 720;
 
-	WinApp * winApp = WinApp::GetInstance();
-	winApp->Initialize();
 
-	DirectXCommon* directXCommon = DirectXCommon::GetInstance();
-	directXCommon->Initialize(winApp);
-
-	Input* input = Input::GetInstance();
-	input->Initialize(winApp);
-
-	TextureManager* textureManager = TextureManager::GetInstance();
-	textureManager->Initialize(directXCommon);
+	BaseSystem::Initalize(windowWidth, windowHeight);
 
 	Sprite::StaticInitalize(
 		directXCommon, textureManager, 
@@ -110,10 +100,10 @@ int MAIN
 	//PipelineBase* shapePipeline = ShapePipeline::GetInstance();
 	//shapePipeline->Create(directXCommon,D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 
-	UINT testImg = textureManager->LoadTexture(L"resources/images/test1.png");
-	UINT aaa = textureManager->LoadTexture(L"resources/images/test.png");
-	UINT hito = textureManager->LoadTexture(L"resources/images/hito.png");
-	UINT dire = textureManager->LoadTexture(L"resources/images/dire.png");
+	UINT testImg = textureManager->LoadTexture("resources/images/test1.png");
+	UINT aaa = textureManager->LoadTexture("resources/images/test.png");
+	UINT hito = textureManager->LoadTexture("resources/images/hito.png");
+	UINT dire = textureManager->LoadTexture("resources/images/dire.png");
 
 	float theta = 0.0f;
 
@@ -291,8 +281,7 @@ int MAIN
 
 	while (!winApp->WindowQUit()) {
 
-		input->Update();
-		directXCommon->PreDraw();
+		BaseSystem::BeginFrame();
 	
 		//LineMeth::PreDraw();
 
@@ -460,11 +449,11 @@ int MAIN
 		
 
 
-		directXCommon->PostDraw();
+		BaseSystem::EndFrame();
 	}
 
 
-	winApp->Finalize();
+	BaseSystem::Finalize();
 
 	return 0;
 }

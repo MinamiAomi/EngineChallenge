@@ -25,16 +25,18 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 
 
-void WinApp::Initialize(int windowWidth, int windowHeight, const wchar_t* windowTitle)
+void WinApp::Initialize(int windowWidth, int windowHeight, const std::string& windowTitle)
 {
 	
 	mWindowWidth = windowWidth;
 	mWindowHeight = windowHeight;
 	
+	wchar_t wtitle[256] = {};
+	MultiByteToWideChar(CP_ACP, 0, windowTitle.c_str(), -1, wtitle, _countof(wtitle));
 
 	mWndClass.cbSize = sizeof(WNDCLASSEX);
 	mWndClass.lpfnWndProc = (WNDPROC)WindowProc;		// ウィンドウプロシージャを設定
-	mWndClass.lpszClassName = windowTitle;					// ウィンドウクラス名
+	mWndClass.lpszClassName = wtitle;					// ウィンドウクラス名
 	mWndClass.hInstance = GetModuleHandle(nullptr);		// ウィンドウハンドル
 	mWndClass.hCursor = LoadCursor(NULL, IDC_ARROW);	// カーソル指定
 
@@ -46,7 +48,7 @@ void WinApp::Initialize(int windowWidth, int windowHeight, const wchar_t* window
 	// ウィンドウオブジェクトの生成
 	mHwnd = CreateWindow(
 		mWndClass.lpszClassName,		// クラス名
-		windowTitle,					// タイトルバーの文字
+		wtitle,					// タイトルバーの文字
 		WS_OVERLAPPEDWINDOW,	// タイトルバーと境界線があるウィンドウ
 		CW_USEDEFAULT,			// 表示ｘ座標は OS にお任せ
 		CW_USEDEFAULT,			// 表示ｙ座標は OS にお任せ

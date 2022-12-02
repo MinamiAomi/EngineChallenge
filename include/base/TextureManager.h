@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include <Array>
 #include "DirectXCommon.h"
+#include <string>
 
 class TextureManager 
 {
@@ -33,7 +34,7 @@ private: // ƒƒ“ƒo•Ï”
 
 public: // ƒƒ“ƒoŠÖ”
 	static TextureManager* GetInstance();
-	static UINT LoadTexture(const wchar_t* filepath);
+	static UINT LoadTexture(const std::string& filePath);
 
 	void Initialize(DirectXCommon* dixCom);
 	void ResetAll();
@@ -47,5 +48,5 @@ private:
 	TextureManager(const TextureManager&) = delete;
 	const TextureManager& operator=(const TextureManager&) = delete;
 
-	UINT LoadTexturePri(const wchar_t* filepath);
+	UINT LoadTexturePri(const std::string& filePath);
 };

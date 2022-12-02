@@ -155,12 +155,14 @@
     <ClCompile Include="include\math\Matrix.cpp" />
     <ClCompile Include="include\math\Vector.cpp" />
     <ClCompile Include="include\PipelineFunc.cpp" />
+    <ClCompile Include="Library2D.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PipelineBase.cpp" />
     <ClCompile Include="PipelineManager.cpp" />
     <ClCompile Include="Shape2D.cpp" />
     <ClCompile Include="ShapePipeline.cpp" />
     <ClCompile Include="SpritePipeline.cpp" />
+    <ClCompile Include="BaseSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeometryModel.h" />
@@ -183,11 +185,13 @@
     <ClInclude Include="include\math\Vector3.h" />
     <ClInclude Include="include\math\Vector4.h" />
     <ClInclude Include="include\PipelineFunc.h" />
+    <ClInclude Include="Library2D.h" />
     <ClInclude Include="PipelineBase.h" />
     <ClInclude Include="PipelineManager.h" />
     <ClInclude Include="Shape2D.h" />
     <ClInclude Include="ShapePipeline.h" />
     <ClInclude Include="SpritePipeline.h" />
+    <ClInclude Include="BaseSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

@@ -3,6 +3,7 @@
 #define WINAPI_H_
 
 #include <Windows.h>
+#include <string>
 
 #define MAIN WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 
@@ -26,7 +27,7 @@ public:
 	inline int GetWindowHeight() const { return mWindowHeight; }
 	inline HINSTANCE GetHInstance() const { return mWndClass.hInstance; }
 
-	void Initialize(int windowWidth = 1280, int windowHeight = 720, const wchar_t* windowTitle = L"DirectXGame");
+	void Initialize(int windowWidth = 1280, int windowHeight = 720, const std::string& windowTitle = "DirectXGame");
 	bool WindowQUit();
 	void Finalize();
 

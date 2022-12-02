@@ -14,9 +14,9 @@ TextureManager* TextureManager::GetInstance()
 	return &instance;
 }
 
-UINT TextureManager::LoadTexture(const wchar_t* filepath)
+UINT TextureManager::LoadTexture(const std::string& filePath)
 {
-	return GetInstance()->LoadTexturePri(filepath);
+	return GetInstance()->LoadTexturePri(filePath);
 }
 
 void TextureManager::Initialize(DirectXCommon* dixCom)
@@ -55,16 +55,19 @@ D3D12_RESOURCE_DESC TextureManager::GetRsourceDesc(UINT texHandle)
 	return m_textures[texHandle].buffer->GetDesc();
 }
 
-UINT TextureManager::LoadTexturePri(const wchar_t* filepath)
+UINT TextureManager::LoadTexturePri(const std::string& filePath)
 {
 	assert(m_nextLoadIndex < kDescriptorCount);
+
+	wchar_t wpath[256] = {};
+	MultiByteToWideChar(CP_ACP, 0, filePath.c_str(), -1, wpath, _countof(wpath));
 
 	HRESULT result = S_FALSE;
 	
 	TexMetadata metadata = {};
 	ScratchImage scratchImg = {};
 
-	result = LoadFromWICFile(filepath, WIC_FLAGS_NONE, &metadata, scratchImg);
+	result = LoadFromWICFile(wpath, WIC_FLAGS_NONE, &metadata, scratchImg);
 
 
 	ScratchImage mipChain = {};
