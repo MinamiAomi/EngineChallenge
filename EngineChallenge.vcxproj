@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\2D;$(SolutionDir)include\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\input;$(SolutionDir)include\2D;$(SolutionDir)include\3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\2D;$(SolutionDir)include\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\base;$(SolutionDir)include\directX;$(SolutionDir)include\math;$(SolutionDir)include\input;$(SolutionDir)include\2D;$(SolutionDir)include\3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,29 +145,31 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GeometryModel.cpp" />
     <ClCompile Include="include\2D\Camera2D.cpp" />
     <ClCompile Include="include\2D\Sprite.cpp" />
+    <ClCompile Include="include\3D\Camera3D.cpp" />
+    <ClCompile Include="include\3D\Material.cpp" />
+    <ClCompile Include="include\3D\Meth.cpp" />
+    <ClCompile Include="include\3D\Model.cpp" />
+    <ClCompile Include="include\3D\Object3D.cpp" />
     <ClCompile Include="include\base\TextureManager.cpp" />
     <ClCompile Include="include\base\WinApp.cpp" />
     <ClCompile Include="include\directX\DirectXCommon.cpp" />
     <ClCompile Include="include\input\Input.cpp" />
+    <ClCompile Include="include\math\MathUtility.cpp" />
     <ClCompile Include="include\math\Matrix.cpp" />
     <ClCompile Include="include\math\Vector.cpp" />
     <ClCompile Include="include\PipelineFunc.cpp" />
-    <ClCompile Include="Library2D.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PipelineBase.cpp" />
-    <ClCompile Include="PipelineManager.cpp" />
-    <ClCompile Include="Shape2D.cpp" />
-    <ClCompile Include="ShapePipeline.cpp" />
-    <ClCompile Include="SpritePipeline.cpp" />
-    <ClCompile Include="BaseSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GeometryModel.h" />
     <ClInclude Include="include\2D\Camera2D.h" />
     <ClInclude Include="include\2D\Sprite.h" />
+    <ClInclude Include="include\3D\Camera3D.h" />
+    <ClInclude Include="include\3D\Material.h" />
+    <ClInclude Include="include\3D\Meth.h" />
+    <ClInclude Include="include\3D\Model.h" />
+    <ClInclude Include="include\3D\Object3D.h" />
     <ClInclude Include="include\base\TextureManager.h" />
     <ClInclude Include="include\base\WinApp.h" />
     <ClInclude Include="include\directX\Buffers.h" />
@@ -185,13 +187,8 @@
     <ClInclude Include="include\math\Vector3.h" />
     <ClInclude Include="include\math\Vector4.h" />
     <ClInclude Include="include\PipelineFunc.h" />
-    <ClInclude Include="Library2D.h" />
-    <ClInclude Include="PipelineBase.h" />
-    <ClInclude Include="PipelineManager.h" />
-    <ClInclude Include="Shape2D.h" />
-    <ClInclude Include="ShapePipeline.h" />
-    <ClInclude Include="SpritePipeline.h" />
-    <ClInclude Include="BaseSystem.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Souko.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -202,6 +199,18 @@
     <FxCompile Include="BasicPS.hlsl" />
     <FxCompile Include="BasicVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ModelPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ModelVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="ShapePS.hlsl">
@@ -231,8 +240,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.hlsli" />
+    <None Include="Model.hlsli" />
     <None Include="Shape.hlsli" />
     <None Include="Sprite.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="EngineChallenge.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

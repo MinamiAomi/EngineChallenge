@@ -210,3 +210,33 @@ namespace Math
 
 }
 
+namespace Color {
+
+	static const unsigned int kByteMax = 0xFF;
+
+	static const Vector4 Black = { 0.0f,0.0f,0.0f,1.0f };
+	static const Vector4 White = { 1.0f,1.0f,1.0f,1.0f };
+	static const Vector4 Red = { 1.0f,0.0f,0.0f,1.0f };
+	static const Vector4 Green = { 0.0f,1.0f,0.0f,1.0f };
+	static const Vector4 Blue = { 0.0f,0.0f,1.0f,1.0f };
+
+	
+	unsigned int Create(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+
+	/// <summary>
+	/// 色ベクトルに変換
+	/// </summary>
+	/// <param name="color">カラーコード</param>
+	/// <returns></returns>
+	Vector4 ToVector4(unsigned int color);
+	
+	/// <summary>
+	/// HSVからRGBに変換
+	/// </summary>
+	/// <param name="h">色相 : 0 ~ 360</param>
+	/// <param name="s">彩度 : 0 ~ 1</param>
+	/// <param name="v">明度 : 0 ~ 1</param>
+	/// <param name="a">透明度 0 ~ 255 符号なし整数型</param>
+	/// <returns></returns>
+	unsigned int HsvaToRgba(float h, float s, float v, unsigned int a);
+}

@@ -5,6 +5,7 @@
 #include "IndexBuffer.h"
 #include "ConstBuffer.h"
 #include "PipelineFunc.h"
+#include <memory>
 
 class Sprite
 {
@@ -41,7 +42,7 @@ public: // 静的メンバ関数
 	// 静的メンバの初期化
 	static void StaticInitalize(DirectXCommon* dixCom, TextureManager* texMan, UINT winWidth, UINT winHeight);
 
-	static Sprite* Create(
+	static std::unique_ptr<Sprite> Create(
 		UINT  textureHandle, Vector2 position, Vector2 size = { 0,0 }, Vector4 color = { 1,1,1,1 },
 		Vector2 anchorPoint = { 0,0 }, bool isFlipX = false, bool isFlipY = false);
 

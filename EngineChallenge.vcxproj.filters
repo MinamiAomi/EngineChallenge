@@ -19,17 +19,8 @@
     <Filter Include="Engine\PipeLine">
       <UniqueIdentifier>{348984b7-d939-41fb-b248-a26025d65078}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\PipeLine\Base">
-      <UniqueIdentifier>{851c19b3-2ba1-4350-9244-f39f0ef9be6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\PipeLine\Sprite">
-      <UniqueIdentifier>{84c084e5-0602-4b55-9ab6-89eb0ea1aedc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Base">
       <UniqueIdentifier>{b8b6e8ba-08e7-42ed-b129-b197c9625b56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\PipeLine\Shape">
-      <UniqueIdentifier>{613d5d20-44fd-46ef-9629-ebec65059bdb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Buffer">
       <UniqueIdentifier>{17ca23eb-9417-404b-ad27-09447b44fa29}</UniqueIdentifier>
@@ -49,32 +40,17 @@
     <Filter Include="Engine\リソース ファイル\Shape">
       <UniqueIdentifier>{b01fa88d-30a4-4f4b-ae1b-3e4b4917e697}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\GeometryModel">
-      <UniqueIdentifier>{64ee20d4-ac89-452e-826f-3ef3ebe8b3fd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Math\Matrix">
       <UniqueIdentifier>{6e54b020-e53b-43f0-bbde-ebe424417242}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Math\Quaternion">
       <UniqueIdentifier>{24b48daf-c309-4a60-86ad-0c3ef20983ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\PipeLine\PipelineManager">
-      <UniqueIdentifier>{4d5c0376-cc93-4f0a-a387-a42f8d9495cb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\2D">
       <UniqueIdentifier>{ffae141e-0ff3-4267-b427-a44b749f56c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\2D\Sprite">
-      <UniqueIdentifier>{bbe89e4d-9ea3-4393-bbd6-d787c2deff8b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\2D\Camera">
       <UniqueIdentifier>{5a32b33b-2e8b-48f5-a56b-72991f12070b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\2D\Shape">
-      <UniqueIdentifier>{63410806-8971-4ba4-9ec2-9cb2feec77ba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\2D\Library">
-      <UniqueIdentifier>{cd221ed3-0337-4808-ba38-e0dd1de15518}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Base\DirectXCommon">
       <UniqueIdentifier>{b8672060-4e3b-4720-a5cd-abd471136ee8}</UniqueIdentifier>
@@ -88,27 +64,33 @@
     <Filter Include="Engine\Base\Input">
       <UniqueIdentifier>{4b53f6d5-0b8c-4330-af43-65853a9e87a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Base\System">
-      <UniqueIdentifier>{0858b2e0-8cbb-4beb-bf12-074a72d5cfcc}</UniqueIdentifier>
+    <Filter Include="Engine\3D">
+      <UniqueIdentifier>{95b092bd-5cc9-4a57-8d73-ed05da737cdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\3D\Camera">
+      <UniqueIdentifier>{4a1a3525-79cd-437e-a63c-acce639190d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\3D\Model">
+      <UniqueIdentifier>{8565b393-3709-468d-a7bd-bf1edc9ddbd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\3D\Object">
+      <UniqueIdentifier>{cf81b4ba-884d-41c5-8912-e19c35284048}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\リソース ファイル\Model">
+      <UniqueIdentifier>{526b46cf-a689-48be-a673-01a229397687}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\2D\Sprite">
+      <UniqueIdentifier>{bbe89e4d-9ea3-4393-bbd6-d787c2deff8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\3D\Material">
+      <UniqueIdentifier>{1839fe2f-a21d-4d51-8e82-9fa2fabfb579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\3D\Meth">
+      <UniqueIdentifier>{20ad0f6a-e88c-45fb-8a71-26b5725144b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PipelineBase.cpp">
-      <Filter>Engine\PipeLine\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="SpritePipeline.cpp">
-      <Filter>Engine\PipeLine\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="ShapePipeline.cpp">
-      <Filter>Engine\PipeLine\Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="GeometryModel.cpp">
-      <Filter>Engine\GeometryModel</Filter>
-    </ClCompile>
-    <ClCompile Include="PipelineManager.cpp">
-      <Filter>Engine\PipeLine\PipelineManager</Filter>
-    </ClCompile>
     <ClCompile Include="include\math\Vector.cpp">
       <Filter>Engine\Math\Vector</Filter>
     </ClCompile>
@@ -124,12 +106,6 @@
     <ClCompile Include="include\PipelineFunc.cpp">
       <Filter>Engine\PipeLine</Filter>
     </ClCompile>
-    <ClCompile Include="Shape2D.cpp">
-      <Filter>Engine\2D\Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="Library2D.cpp">
-      <Filter>Engine\2D\Library</Filter>
-    </ClCompile>
     <ClCompile Include="include\directX\DirectXCommon.cpp">
       <Filter>Engine\Base\DirectXCommon</Filter>
     </ClCompile>
@@ -142,31 +118,31 @@
     <ClCompile Include="include\input\Input.cpp">
       <Filter>Engine\Base\Input</Filter>
     </ClCompile>
-    <ClCompile Include="BaseSystem.cpp">
-      <Filter>Engine\Base\System</Filter>
+    <ClCompile Include="include\math\MathUtility.cpp">
+      <Filter>Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="include\3D\Camera3D.cpp">
+      <Filter>Engine\3D\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="include\3D\Material.cpp">
+      <Filter>Engine\3D\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="include\3D\Meth.cpp">
+      <Filter>Engine\3D\Meth</Filter>
+    </ClCompile>
+    <ClCompile Include="include\3D\Model.cpp">
+      <Filter>Engine\3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="include\3D\Object3D.cpp">
+      <Filter>Engine\3D\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\math\Vector4.h">
       <Filter>Engine\Math\Vector</Filter>
     </ClInclude>
-    <ClInclude Include="PipelineBase.h">
-      <Filter>Engine\PipeLine\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="SpritePipeline.h">
-      <Filter>Engine\PipeLine\Sprite</Filter>
-    </ClInclude>
     <ClInclude Include="include\directX\d3dx12.h">
       <Filter>Engine\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="ShapePipeline.h">
-      <Filter>Engine\PipeLine\Shape</Filter>
-    </ClInclude>
-    <ClInclude Include="GeometryModel.h">
-      <Filter>Engine\GeometryModel</Filter>
-    </ClInclude>
-    <ClInclude Include="PipelineManager.h">
-      <Filter>Engine\PipeLine\PipelineManager</Filter>
     </ClInclude>
     <ClInclude Include="include\math\Vector2.h">
       <Filter>Engine\Math\Vector</Filter>
@@ -207,12 +183,6 @@
     <ClInclude Include="include\PipelineFunc.h">
       <Filter>Engine\PipeLine</Filter>
     </ClInclude>
-    <ClInclude Include="Shape2D.h">
-      <Filter>Engine\2D\Shape</Filter>
-    </ClInclude>
-    <ClInclude Include="Library2D.h">
-      <Filter>Engine\2D\Library</Filter>
-    </ClInclude>
     <ClInclude Include="include\directX\DirectXCommon.h">
       <Filter>Engine\Base\DirectXCommon</Filter>
     </ClInclude>
@@ -225,8 +195,24 @@
     <ClInclude Include="include\input\Input.h">
       <Filter>Engine\Base\Input</Filter>
     </ClInclude>
-    <ClInclude Include="BaseSystem.h">
-      <Filter>Engine\Base\System</Filter>
+    <ClInclude Include="Souko.h" />
+    <ClInclude Include="resource.h">
+      <Filter>Engine\ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="include\3D\Camera3D.h">
+      <Filter>Engine\3D\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="include\3D\Material.h">
+      <Filter>Engine\3D\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="include\3D\Meth.h">
+      <Filter>Engine\3D\Meth</Filter>
+    </ClInclude>
+    <ClInclude Include="include\3D\Model.h">
+      <Filter>Engine\3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="include\3D\Object3D.h">
+      <Filter>Engine\3D\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +234,12 @@
     <FxCompile Include="ShapeVS.hlsl">
       <Filter>Engine\リソース ファイル\Shape</Filter>
     </FxCompile>
+    <FxCompile Include="ModelPS.hlsl">
+      <Filter>Engine\リソース ファイル\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="ModelVS.hlsl">
+      <Filter>Engine\リソース ファイル\Model</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.hlsli">
@@ -259,5 +251,13 @@
     <None Include="Shape.hlsli">
       <Filter>Engine\リソース ファイル\Shape</Filter>
     </None>
+    <None Include="Model.hlsli">
+      <Filter>Engine\リソース ファイル\Model</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="EngineChallenge.rc">
+      <Filter>Engine\リソース ファイル</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -168,9 +168,9 @@ void Sprite::StaticInitalize(DirectXCommon* dixCom, TextureManager* texMan, UINT
 
 }
 
-Sprite* Sprite::Create(uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 color, Vector2 anchorPoint, bool isFlipX, bool isFlipY)
+std::unique_ptr<Sprite> Sprite::Create(uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 color, Vector2 anchorPoint, bool isFlipX, bool isFlipY)
 {
-	return new Sprite(textureHandle, position, size, color, anchorPoint, isFlipX, isFlipY);
+	return std::make_unique<Sprite>(textureHandle, position, size, color, anchorPoint, isFlipX, isFlipY);
 }
 
 void Sprite::Draw(Sprite& sprite, const Camera2D* camera, BlendMode blend)

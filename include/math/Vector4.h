@@ -69,13 +69,8 @@ public:
 	Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 	Vector4(const Vector4& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
 	~Vector4() {}
+
+	void xyz(float ix, float iy, float iz) { x = ix, y = iy, z = iz; }
+	void xy(float ix, float iy) { x = ix, y = iy; }
 };
 
-
-namespace Color {
-	static const Vector4 Black = { 0.0f,0.0f,0.0f,1.0f };
-	static const Vector4 White = { 1.0f,1.0f,1.0f,1.0f };
-	static const Vector4 Red   = { 1.0f,0.0f,0.0f,1.0f };
-	static const Vector4 Green = { 0.0f,1.0f,0.0f,1.0f };
-	static const Vector4 Blue  = { 0.0f,0.0f,1.0f,1.0f };
-};
