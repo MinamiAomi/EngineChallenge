@@ -1,11 +1,14 @@
 #include "Model.h"
-#include <cassert>
 #include "DirectXCommon.h"
 #include "TextureManager.h"
+#include "Object3D.h"
+#include <d3dcompiler.h>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <d3dcompiler.h>
+#include <map>
+#include <iomanip>
 
 #pragma comment(lib,"d3dcompiler.lib")
 
@@ -15,7 +18,18 @@ std::string Model::directory;
 Model::ComPtr<ID3D12RootSignature> Model::rootSignature; // ルートシグネチャ
 Model::ComPtr<ID3D12PipelineState> Model::pipelineState; // パイプラインステート
 
-
+std::vector<std::string> Split(const std::string& instr, const char* delim) {
+	std::vector<std::string> result;
+	std::string str = instr;
+	char* context = nullptr;
+	char* token = strtok_s(const_cast<char*>(str.c_str()), delim, &context);
+	while (token != nullptr)
+	{
+		result.push_back(std::string(token));
+		token = strtok_s(nullptr, delim, &context);
+	}
+	return result;
+}
 
 void Model::StaticInitalize(DirectXCommon* dixcom, TextureManager* texmana, const std::string& dir)
 {
@@ -85,8 +99,9 @@ void Model::StaticInitalize(DirectXCommon* dixcom, TextureManager* texmana, cons
 
 	// ルートパラメータ
 	CD3DX12_ROOT_PARAMETER rootParams[kRootParameterCount] = {};
-	rootParams[kTransform].InitAsConstantBufferView(0);
-	rootParams[kMaterial].InitAsConstantBufferView(1);
+	rootParams[kWorldTransform].InitAsConstantBufferView(0);
+	rootParams[kCamera].InitAsConstantBufferView(1);
+	rootParams[kMaterial].InitAsConstantBufferView(2);
 	rootParams[kTexture].InitAsDescriptorTable(1, &descriptorRange);
 
 
@@ -171,33 +186,44 @@ void Model::StaticInitalize(DirectXCommon* dixcom, TextureManager* texmana, cons
 
 }
 
-Model::Ptr Model::CreateFromObj(const std::string& path)
+std::unique_ptr<Model> Model::CreateFromObj(const std::string& path)
 {
 	// パスに.objが含まれている
 	assert(strstr(path.c_str(), ".obj") !=  NULL);
 	
-	std::string filepath = directory + path;
-	std::ifstream objfile(filepath);
+	auto splitPath = Split(path, "/");
+	std::string modelFileDirectory = directory;
+
+	for (size_t i = 0; i < splitPath.size() - 1; i++) {
+		modelFileDirectory = modelFileDirectory + splitPath[i] + "/";
+	}
+
+	std::string objFilePath = directory + path;
+
+	std::ifstream objfile(objFilePath);
 	// ファイル が開けない場合
 	assert(objfile);
+
+	// 生成されるモデル
+	std::unique_ptr<Model> result(new Model);
 
 	// バッファ
 	std::string mtlFilePath; // mtlファイルパス
 	std::vector<Vector3> posbuf; // 座標
 	std::vector<Vector3> normalbuf; // 法線
 	std::vector<Vector2> uvbuf; // uv
-	std::unordered_map<std::string, std::vector<Meth::Vertex>> vertcies; // 頂点インデックス
-	std::unordered_map<std::string, std::vector<uint16_t>> indcies; // 頂点インデックス
-	Ptr result(new Model);
 
+	std::vector<Meth::Vertex> vertcies; // 頂点インデックス
+	std::vector<std::string> indexKeys; // インデックスのキー
 
 	std::string currentMtlName;
+	Meth* currentMeth = nullptr;
 
 	std::string line;
 	// ファイル終わりまで
 	while (std::getline(objfile, line)) {
 		// 現在読み込んでいるマテリアルの名前
-		
+
 		if (line.empty()) { // 空の行は飛ばす
 			continue;
 		}
@@ -223,33 +249,105 @@ Model::Ptr Model::CreateFromObj(const std::string& path)
 		}
 		else if (token == "mtllib") { // mtlファイルのパス
 			iss >> mtlFilePath;
+			mtlFilePath = modelFileDirectory + mtlFilePath;
 		}
 		else if (token == "usemtl") { // マテリアルの設定
 			iss >> currentMtlName;
 			// マテリアルと対応するメッシュを生成
-			result->m_materials.emplace_back(Material::Create(currentMtlName));
-			result->m_meths.emplace_back(Meth::Create(currentMtlName));
-			indcies[currentMtlName] = {};
-			vertcies[currentMtlName] = {};
+			result->m_materials[currentMtlName] = Material::Create();
+			result->m_materials[currentMtlName]->SetName(currentMtlName);
+			auto newMeth = Meth::Create();
+			newMeth->SetMaterial(result->m_materials[currentMtlName].get());
+			currentMeth = newMeth.get();
+			result->m_meths.emplace_back(std::move(newMeth));
 		}
 		else if (token == "f") { // インデックス
 
-			Vertex tmpV = {};
+			assert(currentMeth != nullptr);
+
+			Meth::Vertex tmpV = {};
 			std::string vertIndex;
 			int v = 0, vn = 0, vt = 0;
 			for (int i = 0; i < 3; i++) {
+				std::ostringstream sout;
 				iss >> vertIndex;
-				sscanf(vertIndex.c_str(), "%d/%d/%d", &v, &vn, &vt);
-				tmpV.position = posbuf[v - 1];
-				tmpV.normal = normalbuf[vn - 1];
-				tmpV.uv = uvbuf[vt - 1];
-				vertcies[currentMtlName].emplace_back(tmpV);
-				indcies[currentMtlName].emplace_back(vertcies.size());
+				sscanf_s(vertIndex.c_str(), "%d/%d/%d", &v, &vt, &vn);
+				sout << std::setfill('0') << std::setw(5) << v;
+				sout << std::setfill('0') << std::setw(5) << vt;
+				sout << std::setfill('0') << std::setw(5) << vn;
+				indexKeys.emplace_back(sout.str());
 			}
 		}
 	}
 
 
+	std::map<std::string, int> entryVertexIds;
+
+	for (auto& it : indexKeys) {
+		std::cout << it.c_str() << std::endl;
+	}
+
+	objfile.close();
+
+	std::ifstream mtlfile(mtlFilePath);
+	assert(mtlfile);
+
+	Material* currentMaterial = result->m_materials.begin()->second.get();
+
+	while (std::getline(mtlfile, line)) {
+		// 現在読み込んでいるマテリアルの名前
+
+		if (line.empty()) { // 空の行は飛ばす
+			continue;
+		}
+		std::istringstream iss(line);	// スペースで区切る 
+		std::string token;
+		iss >> token; // 先頭の要素がトークンになる
+
+		if (token == "newmtl") { // マテリアル
+			iss >> currentMtlName;
+			currentMaterial = result->m_materials[currentMtlName].get();
+		}
+		else if (token == "Ka") { // アンビエント
+			Vector3 tmp = {};
+			iss >> tmp.x >> tmp.y >> tmp.z;
+			currentMaterial->m_ambient = tmp;
+		}
+		else if (token == "Kd") { // ディフューズ
+			Vector3 tmp = {};
+			iss >> tmp.x >> tmp.y >> tmp.z;
+			currentMaterial->m_diffuse = tmp;
+		}
+		else if (token == "Ks") { // スペキュラー
+			Vector3 tmp = {};
+			iss >> tmp.x >> tmp.y >> tmp.z;
+			currentMaterial->m_specular = tmp;
+		}
+		else if (token == "d") { // 透明度
+			float tmp = 0.0f;
+			iss >> tmp;
+			currentMaterial->m_alpha = tmp;
+		}
+		else if (token == "map_Kd") { // テクスチャパス
+			std::string tmp;
+			iss >> tmp;
+			currentMaterial->m_texFileName = tmp;
+		}
+	}
 
 
+
+	return std::move(result);
+
+}
+
+void Model::Draw(ID3D12GraphicsCommandList* cmdList, Object3D* object)
+{
+	for (auto& it : m_meths) {
+		cmdList->SetGraphicsRootSignature(rootSignature.Get());
+		cmdList->SetPipelineState(pipelineState.Get());
+		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		object->Transfer(cmdList);
+		it->Draw(cmdList, kMaterial, kTexture);
+	}
 }

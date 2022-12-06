@@ -15,9 +15,6 @@
 
 class Model 
 {
-public:
-	using Ptr = std::unique_ptr<Model>;
-
 private:
 	template<class TYPE>
 	using ComPtr = Microsoft::WRL::ComPtr<TYPE>;
@@ -33,7 +30,8 @@ public:
 
 	enum RootParameter 
 	{
-		kTransform,		// 変換行列
+		kWorldTransform,			// ワールド行列
+		kCamera,		// カメラデータ（行列も含む）
 		kMaterial,		// マテリアル
 		kTexture,       // テクスチャ
 
@@ -63,17 +61,10 @@ public:
 	/// </summary>
 	/// <param name="path">ファイルパス</param>
 	/// <returns>Modelのスマートポインタ</returns>
-	static Ptr CreateFromObj(const std::string& path);
-
-	static void PreDraw();
+	static std::unique_ptr<Model> CreateFromObj(const std::string& path);
 
 private:
 	
-	VertexBuffer<Vertex> m_vertBuff;
-	IndexBuffer m_indexBuff;
-	std::vector<Vertex> m_vertcies;
-	std::vector<uint16_t> m_indcies;
-
 	std::string m_name;
 	std::vector<std::unique_ptr<Meth>> m_meths;
 	std::unordered_map<std::string, std::unique_ptr<Material>> m_materials;
@@ -81,9 +72,7 @@ private:
 public:
 	~Model() {}
 
-	void Draw(UINT textureHandle);
-	void Draw();
-
+	void Draw(ID3D12GraphicsCommandList* cmdList, class Object3D* object);
 private:
 	Model() {}
 };

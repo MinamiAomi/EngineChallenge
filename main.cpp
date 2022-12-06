@@ -59,7 +59,6 @@ int MAIN
 	textureManager->LoadTexture("resources/images/white.png");
 
 	Model::StaticInitalize(directXCommon, textureManager);
-	Object3D::StaticInitalize(directXCommon);
 
 	UINT testImg = textureManager->LoadTexture("resources/images/test1.png");
 	UINT test1Img = textureManager->LoadTexture("resources/images/test.png");
@@ -69,9 +68,9 @@ int MAIN
 
 	camera.SetPosition({0.0f,10.0f,-10.0f});
 
-	auto cube = Model::CreateFromObj("cube/Cube.obj");
-	auto carrot = Model::CreateFromObj("carrot/Carrot.obj");
-	auto sphere = Model::CreateFromObj("sphere/Sphere.obj");
+	auto cube = Model::CreateFromObj("test/Test.obj");
+	//auto carrot = Model::CreateFromObj("carrot/Carrot.obj");
+	//auto sphere = Model::CreateFromObj("sphere/Sphere.obj");
 	
 	const size_t kObjNum = 3;
 	std::vector<Object3D> obj(kObjNum);
@@ -80,13 +79,11 @@ int MAIN
 		obj[i].SetCamera(camera);
 		obj[i].SetPosition({ 5.0f * i,0.0f,0.0f });
 		obj[i].SetRotation({ 0.0f,0.0f, -Math::ToRadians(45.0f) });
+		obj[i].SetModel(cube.get());
 	}
 
-	obj[0].SetModel(cube.get());
-	obj[0].SetType(Model::kLineList);
-	obj[1].SetModel(carrot.get());
-	obj[1].SetType(Model::kLineStrip);
-	obj[2].SetModel(sphere.get());
+	//obj[1].SetModel(carrot.get());
+	//obj[2].SetModel(sphere.get());
 
 
 	directXCommon->SetClearColor(Color::ToVector4(0x000000FF));
@@ -144,7 +141,7 @@ int MAIN
 		//Sprite::Draw(_00, &camera2D, kBlendModeNormal);
 		
 		obj[0].Draw();
-		obj[1].Draw(carrotImg);
+		obj[1].Draw();
 		obj[2].Draw();
 
 

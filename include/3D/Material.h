@@ -21,10 +21,10 @@ private:
 	};
 
 public:
-	static std::unique_ptr<Material> Create(std::string name);
+	static std::unique_ptr<Material> Create();
 
 private:
-	const std::string m_name;				// マテリアルの名前
+	std::string m_name;				// マテリアルの名前
 	std::string m_texFileName;		// テクスチャの名前
 	Vector3 m_ambient = { 0.3f,0.3f,0.3f };				// アンビエント
 	Vector3 m_diffuse = { 0.0f,0.0f,0.0f };				// ディフューズ
@@ -35,6 +35,7 @@ private:
 	UINT m_textureHandle = 0;
 
 public:
+	void SetName(const std::string& name) { m_name = name; }
 	const std::string& GetName() const { return m_name; }
 	void SetTexFileName(const std::string& name) { m_texFileName = name; }
 	const std::string& GetTexFileName() const { return m_texFileName; }
@@ -52,7 +53,7 @@ public:
 	void SetGraphicsCommand(ID3D12GraphicsCommandList* cmdList, UINT rootParameterIndexMaterial, UINT rootParameterIndexTexture);
 
 private:
-	Material(std::string name) : m_name(name) {}
+	Material() {}
 
 };
 

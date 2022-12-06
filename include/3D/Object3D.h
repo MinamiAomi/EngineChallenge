@@ -10,18 +10,11 @@ class Object3D
 public:
 	struct ConstBudderDataTransform
 	{
-		Matrix44 viewProj;
 		Matrix44 world;
 	};
 
 private:
-	static class DirectXCommon* dixCom;
-
-public:
-	static void StaticInitalize(DirectXCommon* dixcom);
-
-private:
-	ConstBuffer<ConstBudderDataTransform> m_constBufferTransform;
+	ConstBuffer<ConstBudderDataTransform> m_constBuffer;
 	Vector3 m_scale = { 1.0f,1.0f,1.0f };
 	Vector3 m_rotation = { 0.0f,0.0f,0.0f };
 	Vector3 m_position = { 0.0f,0.0f,0.0f };
@@ -30,7 +23,6 @@ private:
 	class Model* m_model = nullptr;
 	class Camera3D* m_camera = nullptr;
 
-	Model::PrimitiveTopologyType m_type = Model::kTriangleList;
 
 public:
 	void SetPosition(const Vector3& pos) { m_position = pos; }
@@ -47,13 +39,13 @@ public:
 	void SetModel(Model* model) { m_model = model; }
 	void SetCamera(Camera3D& camera) { m_camera = &camera; }
 	void SetCamera(Camera3D* camera) { m_camera = camera; }
-	void SetType(Model::PrimitiveTopologyType type) { m_type = type; }
 
 	Object3D();
-	~Object3D();
+	~Object3D() {}
 	
 	void UpdateMatrix();
 
-	void Draw(UINT tex = 0);
-	void Draw(Model* model, Camera3D* camera, UINT tex = 0);
+	void Draw();
+	void Draw(Model* model);
+	void Transfer(ID3D12GraphicsCommandList* cmdList);
 };

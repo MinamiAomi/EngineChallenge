@@ -33,6 +33,8 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	CreateRenderTargetView();
 	CreateDepthBuffer();
 	CreateFence();
+
+	m_isInit = true;
 }
 
 void DirectXCommon::PreDraw() 

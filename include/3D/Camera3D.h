@@ -1,13 +1,24 @@
 #pragma once
 
 #include "MathUtility.h"
+#include <d3dx12.h>
+#include "ConstBuffer.h"
 
 class Camera3D
 {
 
+public:
+	struct ConstBufferDataCamera
+	{
+		Matrix44 view;
+		Matrix44 proj;
+		Vector3 cameraPos;
+	};
+
 private:
 	
-	// ビュー要素
+	ConstBuffer<ConstBufferDataCamera> m_constBuffer;
+
 	Vector3 m_eye = { 0.0f,0.0f,-50.0f }; // 視点座標
 	Vector3 m_target = { 0.0f,0.0f,0.0f }; // 注視点座標
 	Vector3 m_up = { 0.0f,1.0f,0.0f }; // 上ベクトル
@@ -24,7 +35,7 @@ private:
 	Matrix44 m_viewProjMat;
 
 public:
-	Camera3D() {}
+	Camera3D();
 	~Camera3D() {}
 
 	void SetPosition(const Vector3& pos) { m_eye = pos; }
@@ -49,5 +60,7 @@ public:
 	const Matrix44& GetViewProjMat() const { return m_viewProjMat; }
 
 	void UpdateMatrix();
+
+	void SetGraphicsCommand(ID3D12GraphicsCommandList* cmdList, UINT rootParameterIndexCamera);
 
 };

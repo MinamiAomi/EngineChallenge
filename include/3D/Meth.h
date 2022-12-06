@@ -9,7 +9,6 @@ class Meth
 {
 	
 public:
-public:
 	struct Vertex
 	{
 		Vector3 position;	// ç¿ïW
@@ -18,7 +17,7 @@ public:
 	};
 
 public:
-	static std::unique_ptr<Meth> Create(class Material* material);
+	static std::unique_ptr<Meth> Create();
 
 private:
 	VertexBuffer<Vertex> m_vertBuff;
@@ -42,6 +41,6 @@ public:
 	void Draw(ID3D12GraphicsCommandList* cmdList, UINT rootParameterIndexMaterial, UINT rootParameterIndexTexture);
 
 private:
-	Meth(Material* material) : m_material(material) {}
+	Meth() {}
 };
 

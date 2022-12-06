@@ -2,22 +2,12 @@
 #include "DirectXCommon.h"
 #include "Camera3D.h"
 
-DirectXCommon* Object3D::dixCom = nullptr;
-
-void Object3D::StaticInitalize(DirectXCommon* dixcom) 
-{
-	assert(dixcom != nullptr);
-	dixCom = dixcom;
-}
-
 Object3D::Object3D() 
 {
-	m_constBufferTransform.Create(dixCom->GetDevice());
-	m_constBufferTransform.Map();
-}
-Object3D::~Object3D() 
-{
-	dixCom = nullptr;
+	auto dixcom = DirectXCommon::GetInstance();
+	assert(dixcom->IsInit());
+	m_constBuffer.Create(dixcom->GetDevice());
+	m_constBuffer.Map();
 }
 
 void Object3D::UpdateMatrix() 
@@ -40,27 +30,29 @@ void Object3D::UpdateMatrix()
 	if (m_parent != nullptr) {
 		m_worldMatrix *= m_parent->m_worldMatrix;
 	}
+
+	m_constBuffer.MapPtr()->world = m_worldMatrix;
 }
 
-void Object3D::Draw(UINT tex)
+void Object3D::Draw()
 {
-	auto* cmdList = dixCom->GetCommandList();
+	auto dixcom = DirectXCommon::GetInstance();
+	assert(dixcom->IsInit());
+	auto cmdList = dixcom->GetCommandList();
 
-	m_constBufferTransform.MapPtr()->viewProj = m_camera->GetViewProjMat();
-	m_constBufferTransform.MapPtr()->world = m_worldMatrix;
-	
-	Model::PreDraw(m_type);
-	m_constBufferTransform.SetGraphicsRootConstantBufferView(cmdList, Model::kTransform);
-	m_model->Draw(m_type,tex);
+	m_model->Draw(cmdList, this);
 }
-void Object3D::Draw(Model* model, Camera3D* camera, UINT tex) 
+void Object3D::Draw(Model* model)
 {
-	auto* cmdList = dixCom->GetCommandList();
+	auto dixcom = DirectXCommon::GetInstance();
+	assert(dixcom->IsInit());
+	auto cmdList = dixcom->GetCommandList();
 
-	m_constBufferTransform.MapPtr()->viewProj = camera->GetViewProjMat();
-	m_constBufferTransform.MapPtr()->world = m_worldMatrix;
+	model->Draw(cmdList, this);
+}
 
-	Model::PreDraw(m_type);
-	m_constBufferTransform.SetGraphicsRootConstantBufferView(cmdList, Model::kTransform);
-	model->Draw(m_type, tex);
+void Object3D::Transfer(ID3D12GraphicsCommandList* cmdList) 
+{
+	m_constBuffer.SetGraphicsRootConstantBufferView(cmdList, Model::kWorldTransform);
+	m_camera->SetGraphicsCommand(cmdList, Model::kCamera);
 }

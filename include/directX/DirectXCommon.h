@@ -17,6 +17,8 @@ private:
 	using ComPtr = Microsoft::WRL::ComPtr<TYPE>;
 
 private:
+	bool m_isInit = false;
+	
 	WinApp* m_winApp = nullptr;
 
 	ComPtr<ID3D12Device>				 m_device;
@@ -40,6 +42,8 @@ public: // Ã“Iƒƒ“ƒoŠÖ”
 	static DirectXCommon* GetInstance();
 
 public:
+	inline bool IsInit() const { return m_isInit; }
+
 	inline ID3D12Device* GetDevice() { return m_device.Get(); }
 	inline ID3D12GraphicsCommandList* GetCommandList() { return m_cmdList.Get(); }
 

@@ -1,9 +1,16 @@
 #include "Material.h"
 #include "TextureManager.h"
 
-std::unique_ptr<Material> Material::Create(std::string name)
+std::unique_ptr<Material> Material::Create()
 {
-	return std::make_unique<Material>(name);
+	//struct impl : public Material
+	//{
+	//	impl() {}
+	//};
+	//
+	//return std::make_unique<impl>();
+
+	return std::unique_ptr<Material>(new Material);
 }
 
 void Material::CreateBuffer(ID3D12Device* dev)
