@@ -15,7 +15,7 @@ private:
 		Vector3 ambient;	// 環境光（アンビエント）
 		float padding_1;	// パディング
 		Vector3 deffuse;	// 拡散光（ディフューズ）
-		float padding_2;	// パディング
+		float shininess;	// 光沢度
 		Vector3 specular;	// 鏡面反射光（スペキュラー）
 		float alpha;		// 透明度（アルファ）
 	};
@@ -28,7 +28,8 @@ private:
 	std::string m_texFileName;		// テクスチャの名前
 	Vector3 m_ambient = { 0.3f,0.3f,0.3f };				// アンビエント
 	Vector3 m_diffuse = { 0.0f,0.0f,0.0f };				// ディフューズ
-	Vector3 m_specular = { 0.0f,0.0f,0.0f };				// スペキュラー
+	Vector3 m_specular = { 0.0f,0.0f,0.0f };			// スペキュラー
+	float m_shininess = 5.0f;
 	float m_alpha = 1.0f;			// 透明度
 
 	ConstBuffer<ConstBufferDataMaterial> m_constBuff;
@@ -45,8 +46,11 @@ public:
 	const Vector3& GetDiffuse() const { return m_diffuse; }
 	void SetSpecular(const Vector3& specular) { m_specular = specular; }
 	const Vector3& GetSpecular() const { return m_specular; }
+	void SetShininess(float shininess) { m_shininess = shininess; }
+	float GetShininess() const { return m_shininess; }
 	void SetAlpha(float alpha) { m_alpha = alpha; }
 	float GetAlpha() const { return m_alpha; }
+	void SetTextureHandle(UINT tex) { m_textureHandle = tex; }
 	UINT GetTextureHandle() const { return m_textureHandle; }
 
 	void CreateBuffer(ID3D12Device* dev);

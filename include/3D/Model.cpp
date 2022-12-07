@@ -17,6 +17,7 @@ TextureManager* Model::texMana = nullptr;
 std::string Model::directory;
 Model::ComPtr<ID3D12RootSignature> Model::rootSignature; // ルートシグネチャ
 Model::ComPtr<ID3D12PipelineState> Model::pipelineState; // パイプラインステート
+std::unique_ptr<Material> Model::defaultMaterial;
 
 std::vector<std::string> Split(const std::string& instr, const char* delim) {
 	std::vector<std::string> result;
@@ -147,7 +148,7 @@ void Model::StaticInitalize(DirectXCommon* dixcom, TextureManager* texmana, cons
 	pipelineDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	// ラスタライザの設定
 	pipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	pipelineDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // カリングしない
+	pipelineDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK; // カリングしない
 	//pipelineDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME; // ワイヤーフレーム
 
 	pipelineDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; // RGBAすべてのチャンネルを描画
@@ -182,7 +183,9 @@ void Model::StaticInitalize(DirectXCommon* dixcom, TextureManager* texmana, cons
 
 #pragma endregion
 
-
+	defaultMaterial = std::move(Material::Create());
+	defaultMaterial->CreateBuffer(dixcom->GetDevice());
+	defaultMaterial->SetTextureHandle(0); // 真っ白画像
 
 }
 
@@ -197,7 +200,7 @@ std::unique_ptr<Model> Model::CreateFromObj(const std::string& path)
 	for (size_t i = 0; i < splitPath.size() - 1; i++) {
 		modelFileDirectory = modelFileDirectory + splitPath[i] + "/";
 	}
-
+	
 	std::string objFilePath = directory + path;
 
 	std::ifstream objfile(objFilePath);
@@ -215,6 +218,7 @@ std::unique_ptr<Model> Model::CreateFromObj(const std::string& path)
 
 	std::vector<Meth::Vertex> vertcies; // 頂点インデックス
 	std::vector<std::string> indexKeys; // インデックスのキー
+	std::map<std::string, int> entryVertexIds;
 
 	std::string currentMtlName;
 	Meth* currentMeth = nullptr;
@@ -263,7 +267,12 @@ std::unique_ptr<Model> Model::CreateFromObj(const std::string& path)
 		}
 		else if (token == "f") { // インデックス
 
-			assert(currentMeth != nullptr);
+			if (currentMeth == nullptr) {
+				auto newMeth = Meth::Create();
+				newMeth->SetMaterial(defaultMaterial.get());
+				currentMeth = newMeth.get();
+				result->m_meths.emplace_back(std::move(newMeth));
+			}
 
 			Meth::Vertex tmpV = {};
 			std::string vertIndex;
@@ -272,70 +281,100 @@ std::unique_ptr<Model> Model::CreateFromObj(const std::string& path)
 				std::ostringstream sout;
 				iss >> vertIndex;
 				sscanf_s(vertIndex.c_str(), "%d/%d/%d", &v, &vt, &vn);
+
+				tmpV.position = posbuf[v - 1];
+				tmpV.normal = normalbuf[vn - 1];
+				tmpV.uv = uvbuf[vt - 1];
+
 				sout << std::setfill('0') << std::setw(5) << v;
 				sout << std::setfill('0') << std::setw(5) << vt;
 				sout << std::setfill('0') << std::setw(5) << vn;
-				indexKeys.emplace_back(sout.str());
+				auto key = sout.str();
+				if (entryVertexIds.count(key) > 0) {
+					currentMeth->AddIndex(entryVertexIds[key]);
+				}
+				else {
+					currentMeth->AddVertex(tmpV);
+					UINT index = currentMeth->GetVertexCount() - 1;
+					currentMeth->AddIndex(index);
+					entryVertexIds[key] = index;
+				}
+
+
 			}
 		}
 	}
 
 
-	std::map<std::string, int> entryVertexIds;
-
-	for (auto& it : indexKeys) {
-		std::cout << it.c_str() << std::endl;
-	}
-
 	objfile.close();
 
-	std::ifstream mtlfile(mtlFilePath);
-	assert(mtlfile);
+	if (result->m_materials.empty() == false) {
 
-	Material* currentMaterial = result->m_materials.begin()->second.get();
+		std::ifstream mtlfile(mtlFilePath);
+		assert(mtlfile);
 
-	while (std::getline(mtlfile, line)) {
-		// 現在読み込んでいるマテリアルの名前
+		Material* currentMaterial = result->m_materials.begin()->second.get();
 
-		if (line.empty()) { // 空の行は飛ばす
-			continue;
-		}
-		std::istringstream iss(line);	// スペースで区切る 
-		std::string token;
-		iss >> token; // 先頭の要素がトークンになる
+		while (std::getline(mtlfile, line)) {
+			// 現在読み込んでいるマテリアルの名前
 
-		if (token == "newmtl") { // マテリアル
-			iss >> currentMtlName;
-			currentMaterial = result->m_materials[currentMtlName].get();
-		}
-		else if (token == "Ka") { // アンビエント
-			Vector3 tmp = {};
-			iss >> tmp.x >> tmp.y >> tmp.z;
-			currentMaterial->m_ambient = tmp;
-		}
-		else if (token == "Kd") { // ディフューズ
-			Vector3 tmp = {};
-			iss >> tmp.x >> tmp.y >> tmp.z;
-			currentMaterial->m_diffuse = tmp;
-		}
-		else if (token == "Ks") { // スペキュラー
-			Vector3 tmp = {};
-			iss >> tmp.x >> tmp.y >> tmp.z;
-			currentMaterial->m_specular = tmp;
-		}
-		else if (token == "d") { // 透明度
-			float tmp = 0.0f;
-			iss >> tmp;
-			currentMaterial->m_alpha = tmp;
-		}
-		else if (token == "map_Kd") { // テクスチャパス
-			std::string tmp;
-			iss >> tmp;
-			currentMaterial->m_texFileName = tmp;
+			if (line.empty()) { // 空の行は飛ばす
+				continue;
+			}
+			std::istringstream iss(line);	// スペースで区切る 
+			std::string token;
+			iss >> token; // 先頭の要素がトークンになる
+
+			if (token == "newmtl") { // マテリアル
+				iss >> currentMtlName;
+				currentMaterial = result->m_materials[currentMtlName].get();
+			}
+			else if (token == "Ka") { // アンビエント
+				Vector3 tmp = {};
+				iss >> tmp.x >> tmp.y >> tmp.z;
+				currentMaterial->m_ambient = tmp;
+			}
+			else if (token == "Kd") { // ディフューズ
+				Vector3 tmp = {};
+				iss >> tmp.x >> tmp.y >> tmp.z;
+				currentMaterial->m_diffuse = tmp;
+			}
+			else if (token == "Ks") { // スペキュラー
+				Vector3 tmp = {};
+				iss >> tmp.x >> tmp.y >> tmp.z;
+				currentMaterial->m_specular = tmp;
+			}
+			else if (token == "Ni") { // 光沢度
+				float tmp = 0.0f;
+				iss >> tmp;
+				currentMaterial->m_shininess = tmp;
+			}
+			else if (token == "d") { // 透明度
+				float tmp = 0.0f;
+				iss >> tmp;
+				currentMaterial->m_alpha = tmp;
+			}
+			else if (token == "map_Kd") { // テクスチャパス
+				std::string tmp;
+				iss >> tmp;
+				auto texPath = modelFileDirectory + tmp;
+				currentMaterial->SetTexFileName(texPath);
+				currentMaterial->SetTextureHandle(texMana->LoadTexture(texPath));
+				
+			}
 		}
 	}
 
 
+
+
+	for (auto& it : result->m_meths) {
+		
+		it->CreateBuffer(diXCom->GetDevice());
+	}
+	for (auto& it : result->m_materials) {
+		it.second->CreateBuffer(diXCom->GetDevice());
+	}
 
 	return std::move(result);
 

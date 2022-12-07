@@ -19,6 +19,7 @@ void Material::CreateBuffer(ID3D12Device* dev)
 	m_constBuff.Map();
 	m_constBuff.MapPtr()->ambient = m_ambient;
 	m_constBuff.MapPtr()->deffuse = m_diffuse;
+	m_constBuff.MapPtr()->shininess = m_shininess;
 	m_constBuff.MapPtr()->specular = m_specular;
 	m_constBuff.MapPtr()->alpha = m_alpha;
 }

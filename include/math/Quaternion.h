@@ -26,7 +26,9 @@ public:
 		Quaternion tmp(v, a);
 		return tmp;
 	}
-
+	friend inline Quaternion operator+(const Quaternion& q1, const Quaternion& q2) {
+		return { q1.x + q2.x,q1.y + q2.y,q1.z + q2.z,q1.w + q2.w };
+	}
 	friend inline Quaternion operator*(float s, const Quaternion& q) {
 		return { s * q.x,s * q.y,s * q.z,s * q.w };
 	}
@@ -79,4 +81,20 @@ public:
 		return Conjugate() / LengthSquare();
 	}
 
+
+	static Quaternion Slerp(float t, const Quaternion& start, const Quaternion& end) {
+		Quaternion s = start;
+		float dot_val = start.Dot(end);
+		// q1, q2‚ª”½‘ÎŒü‚«‚Ìê‡
+		if (dot_val < 0) {
+			s.w = -s.w;
+			s.x = -s.x;
+			s.y = -s.y;
+			s.z = -s.z;
+			dot_val = -dot_val;
+		}
+		// ‹…–ÊüŒ`•âŠÔ‚ÌŒvZ
+		float theta = std::acos(dot_val);
+		return (std::sin((1 - t) * theta) * s + std::sin(t * theta) * end) / std::sin(theta);
+	}
 };

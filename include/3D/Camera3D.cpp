@@ -15,12 +15,12 @@ void Camera3D::UpdateMatrix()
 	m_projMat = Matrix44::CreateProjection(m_fovAngleY, m_aspectRatio, m_nearZ, m_farZ);
 	m_viewProjMat = m_viewMat * m_projMat;
 
-	m_constBuffer.MapPtr()->view = m_viewMat;
-	m_constBuffer.MapPtr()->proj = m_projMat;
-	m_constBuffer.MapPtr()->cameraPos = m_eye;
 }
 
 void Camera3D::SetGraphicsCommand(ID3D12GraphicsCommandList* cmdList, UINT rootParameterIndexCamera)
 {
+	m_constBuffer.MapPtr()->view = m_viewMat;
+	m_constBuffer.MapPtr()->proj = m_projMat;
+	m_constBuffer.MapPtr()->cameraPos = m_eye;
 	m_constBuffer.SetGraphicsRootConstantBufferView(cmdList, rootParameterIndexCamera);
 }

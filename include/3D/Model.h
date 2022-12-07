@@ -45,7 +45,7 @@ private:
 	static std::string directory;
 	static ComPtr<ID3D12RootSignature> rootSignature; // ルートシグネチャ
 	static ComPtr<ID3D12PipelineState> pipelineState; // パイプラインステート
-
+	static std::unique_ptr<Material> defaultMaterial;
 
 public:
 

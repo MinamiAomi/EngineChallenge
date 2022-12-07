@@ -42,6 +42,8 @@ public:
 	const Vector3& GetPosition() const { return m_eye; }
 	void SetTarget(const Vector3& target) { m_target = target; }
 	const Vector3& GetTarget() const { return m_target; }
+	void SetRay(const Vector3& ray) { m_target = m_eye + ray; }
+	const Vector3& GetRay() const { return m_target - m_eye; }
 	void SetUp(const Vector3& up) { m_up = up; }
 	const Vector3& GetUp() const { return m_up; }
 	const Matrix44& GetViewMatrix() const { return m_viewMat; }
