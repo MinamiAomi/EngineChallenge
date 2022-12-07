@@ -10,9 +10,9 @@ template<class TYPE>
 class Triplet {
 
 public:
-	TYPE x;	// x¬•ª
-	TYPE y; // y¬•ª
-	TYPE z; // z¬•ª
+	TYPE x = {};	// x¬•ª
+	TYPE y = {};    // y¬•ª
+	TYPE z = {};	// z¬•ª
 
 public:
 	Triplet() {}
@@ -24,7 +24,7 @@ public:
 
 	inline void Set(const TYPE& sx, const TYPE& sy, const TYPE& sz) { x = sx, y = sy, z = sz; }
 	inline void Set(const Triplet& t) { x = t.x, y = t.y, z = t.z; }
-	inline void Set(const Twins<TYPE>& t, const TYPE& z) { x = t.x, y = t.y, z = z; }
+	inline void Set(const Twins<TYPE>& t, const TYPE& iz) { x = t.x, y = t.y, z = iz; }
 
 	inline Triplet operator+() const { return { x, y, z }; }
 	inline Triplet operator-() const { return { -x,-y, -z }; }
@@ -150,9 +150,54 @@ public:
 		return (*this + v) / 2.0f;
 	}
 
+	inline Vector3 RotationX(float theta) const {
+		float s = sinf(theta);
+		float c = cosf(theta);
+		return { x, y * c - z * s, y * s + z * c };
+	}
+
+	inline Vector3 RotationY(float theta) const {
+		float s = sinf(theta);
+		float c = cosf(theta);
+		return { x * c + z * s, y, -x * s + z * c };
+	}
+
+	inline Vector3 RotationZ(float theta) const {
+		float s = sinf(theta);
+		float c = cosf(theta);
+		return { x * c - y * s, x * s + y * c, z };
+	}
+
+
 	// üŒ`•âŠÔ
 	static inline  Vector3 Lerp(float t, const  Vector3& start, const  Vector3& end) {
 		return start + t * (end - start);
+	}
+
+	static inline float Dot(const Vector3& a, const Vector3& b) {
+		return a.x * b.x + a.y * b.y + a.z * b.z;
+	}
+
+	static inline Vector3 Cross(const Vector3& a, const Vector3& b) {
+		return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
+	}
+
+	static inline float LengthSquare(const Vector3& a) {
+		return Dot(a, a);
+	}
+
+	static inline float Length(const Vector3& a) {
+		return sqrtf(LengthSquare(a));
+	}
+
+	static inline Vector3 Normalize(const Vector3& a) {
+		float len = Length(a);
+		return len != 0 ? a / len : a;
+	}
+
+	// ’†“_
+	static inline Vector3 Mid(const Vector3& a, const Vector3& b) {
+		return (a + b) / 2.0f;
 	}
 }; 
 
@@ -183,10 +228,8 @@ inline Vector3 Mid(const Vector3& a, const Vector3& b) {
 }
 
 // üŒ`•âŠÔ
-inline  Vector3 Lerp(float t, const  Vector3& start, const  Vector3& end) {
+inline Vector3 Lerp(float t, const  Vector3& start, const  Vector3& end) {
 	return start + t * (end - start);
 }
-
-
 
 #endif

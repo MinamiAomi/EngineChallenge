@@ -15,6 +15,7 @@ std::unique_ptr<Meth> Meth::Create()
 
 void Meth::CreateBuffer(ID3D12Device* dev)
 {
+
 	// 頂点バッファを生成
 	m_vertBuff.Create(dev, (UINT)m_vertcies.size());
 	m_vertBuff.Map();
