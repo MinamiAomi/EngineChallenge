@@ -6,8 +6,8 @@ template<class TYPE>
 class Twins {
 
 public:
-	TYPE x;	// x¬•ª
-	TYPE y; // y¬•ª
+	TYPE x = {};	// x¬•ª
+	TYPE y = {}; // y¬•ª
 
 
 public:
